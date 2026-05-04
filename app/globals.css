@@ -1,26 +1,74 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ─────────────────────────────────────────────────────────────
+   DESIGN TOKENS — Ecliptic Explorer
+   All tokens defined here become Tailwind utilities automatically.
+   Font loading (Cinzel, Geist) is handled in layout.tsx via next/font.
+───────────────────────────────────────────────────────────── */
+
+@theme {
+  /* ── Space: deep sky backgrounds ── */
+  --color-space-950: #0a0a1a;
+  --color-space-900: #0d0d24;
+  --color-space-800: #12122e;
+  --color-space-700: #1a1a40;
+  --color-space-600: #252560;
+  --color-space-500: #3333a0;
+
+  /* ── Solar: amber — the Sun ── */
+  --color-solar-300: #fcd34d;
+  --color-solar-400: #fbbf24;
+  --color-solar-500: #f59e0b;
+  --color-solar-600: #d97706;
+  --color-solar-700: #b45309;
+
+  /* ── Cosmic: cold blues — interstellar space ── */
+  --color-cosmic-300: #93c5fd;
+  --color-cosmic-400: #60a5fa;
+  --color-cosmic-500: #3b82f6;
+  --color-cosmic-600: #2563eb;
+  --color-cosmic-700: #1d4ed8;
+  --color-cosmic-800: #1e3a8a;
+  --color-cosmic-900: #172554;
+
+  /* ── Stellar: text hierarchy (slate scale) ── */
+  --color-stellar-50:  #f8fafc;
+  --color-stellar-100: #f1f5f9;
+  --color-stellar-200: #e2e8f0;
+  --color-stellar-300: #cbd5e1;
+  --color-stellar-400: #94a3b8;
+  --color-stellar-500: #64748b;
+  --color-stellar-600: #475569;
+
+  /* ── Ophiuchus: the 13th — mystical violet ── */
+  --color-ophiuchus-300: #c4b5fd;
+  --color-ophiuchus-400: #a78bfa;
+  --color-ophiuchus-500: #8b5cf6;
+  --color-ophiuchus-600: #7c3aed;
+
+  /* ── Semantic: result states ── */
+  --color-match:    #10b981;
+  --color-mismatch: #f97316;
+
+  /* ── Glows: drop-shadow utilities ── */
+  --shadow-solar:       0 0 40px 10px rgb(251 191 36 / 0.4);
+  --shadow-solar-sm:    0 0 16px 4px  rgb(251 191 36 / 0.25);
+  --shadow-cosmic:      0 0 40px 10px rgb(96 165 250 / 0.35);
+  --shadow-cosmic-sm:   0 0 16px 4px  rgb(96 165 250 / 0.2);
+  --shadow-ophiuchus:   0 0 40px 10px rgb(139 92 246 / 0.4);
 }
 
+/* Font families reference CSS variables injected by next/font in layout.tsx.
+   --font-cinzel is loaded there; add Cinzel via next/font/google when ready. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-cinzel, 'Palatino Linotype', 'Book Antiqua', Palatino, serif);
+  --font-sans:    var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --font-mono:    var(--font-geist-mono, ui-monospace, monospace);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ── Base ── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-space-950);
+  color: var(--color-stellar-100);
+  font-family: var(--font-sans);
 }
