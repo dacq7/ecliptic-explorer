@@ -9,6 +9,7 @@ import { EclipticRing } from './EclipticRing'
 import { ConstellationRegions } from './ConstellationRegions'
 import { ConstellationLabels } from './ConstellationLabels'
 import { SunOrbit } from './SunOrbit'
+import { SimulationController } from './SimulationController'
 
 const CAMERA_START = new Vector3(0, 22, 18)
 const CAMERA_END = new Vector3(0, 12, 8)
@@ -102,6 +103,7 @@ export function SolarCanvas() {
 
         <CameraController />
         <StoreInvalidator />
+        <SimulationController />
 
         <OrbitControls
           enableZoom={false}

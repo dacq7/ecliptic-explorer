@@ -23,12 +23,15 @@ export interface UIState {
   showIAUBoundaries: boolean
   /** Whether the app is in mobile 2D fallback mode */
   is2DFallback: boolean
+  /** Whether ambient audio is enabled */
+  showAudio: boolean
   /** Actions */
   togglePanel: () => void
   toggleConstellationLines: () => void
   toggleStarNames: () => void
   toggleIAUBoundaries: () => void
   set2DFallback: (value: boolean) => void
+  toggleAudio: () => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -37,6 +40,7 @@ export const useUIStore = create<UIState>((set) => ({
   showStarNames: false,
   showIAUBoundaries: false,
   is2DFallback: false,
+  showAudio: false,
   togglePanel: () => set((s) => ({ isPanelOpen: !s.isPanelOpen })),
   toggleConstellationLines: () =>
     set((s) => ({ showConstellationLines: !s.showConstellationLines })),
@@ -44,4 +48,5 @@ export const useUIStore = create<UIState>((set) => ({
   toggleIAUBoundaries: () =>
     set((s) => ({ showIAUBoundaries: !s.showIAUBoundaries })),
   set2DFallback: (value) => set({ is2DFallback: value }),
+  toggleAudio: () => set((s) => ({ showAudio: !s.showAudio })),
 }))

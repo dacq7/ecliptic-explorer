@@ -6,6 +6,7 @@ import { SolarCanvas } from './SolarCanvas'
 import { SimulationFallback2D } from './SimulationFallback2D'
 import { SimulationSidePanel } from './SimulationSidePanel'
 import { DateSlider } from './DateSlider'
+import { ExplorerControls } from './ExplorerControls'
 
 export function SimulationShell() {
   useWebGLDetect()
@@ -23,6 +24,7 @@ export function SimulationShell() {
       {/* Layer 1: UI overlays — pointer-events: none on container, auto on interactive elements */}
       <div className="absolute inset-0 z-10 pointer-events-none">
         <div className="pointer-events-auto">
+          <ExplorerControls />
           <SimulationSidePanel />
           <DateSlider />
         </div>
