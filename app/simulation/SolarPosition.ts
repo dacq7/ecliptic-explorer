@@ -22,14 +22,13 @@
  * @returns Ecliptic longitude in degrees
  */
 export function getSolarLongitude(date: string): number {
-  // TODO: implement — simplified algorithm:
-  // 1. Compute Julian Day Number from date.
-  // 2. Compute mean longitude L = 280.46° + 0.9856474° × (JD − 2451545.0)
-  // 3. Compute mean anomaly g = 357.528° + 0.9856003° × (JD − 2451545.0)
-  // 4. Compute ecliptic longitude λ = L + 1.915° × sin(g) + 0.020° × sin(2g)
-  // 5. Normalize to 0–360.
-  void date
-  throw new Error('getSolarLongitude is not yet implemented.')
+  const d = new Date(date + 'T12:00:00Z')
+  const JD = d.getTime() / 86400000 + 2440587.5
+  const n = JD - 2451545.0
+  const L = (280.46 + 0.9856474 * n) % 360
+  const g = ((357.528 + 0.9856003 * n) % 360) * (Math.PI / 180)
+  const lambda = L + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)
+  return ((lambda % 360) + 360) % 360
 }
 
 /**

@@ -1,24 +1,122 @@
-/**
- * SolarCanvas — the main 3D canvas for Sistema 1.
- *
- * Owns the Three.js scene: sky sphere, Sun mesh, ecliptic path,
- * and constellation region highlights.
- *
- * MUST live inside a Suspense boundary (see simulation/page.tsx).
- * NEVER import Three.js directly — use @react-three/fiber and @react-three/drei.
- *
- * TODO (Frontend Developer): Implement once @react-three/fiber and
- * @react-three/drei are installed.
- *
- * Dependencies required (not yet installed):
- *   npm install three @react-three/fiber @react-three/drei
- *   npm install --save-dev @types/three
- */
+'use client'
+
+import { Suspense, useEffect, useRef } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Stars, OrbitControls } from '@react-three/drei'
+import { Vector3 } from 'three'
+import { useSimulationStore } from '@/app/store/simulationStore'
+import { getVisualSolarAngle } from '@/app/logic/eclipticAngles'
+import { SunMesh } from './SunMesh'
+
+const CAMERA_START = new Vector3(0, 22, 18)
+const CAMERA_END = new Vector3(0, 12, 8)
+const INTRO_DURATION = 2.5
+
+function CameraController() {
+  const { camera, invalidate } = useThree()
+  const elapsedRef = useRef(0)
+  const doneRef = useRef(false)
+
+  useFrame((_, delta) => {
+    if (doneRef.current) return
+    elapsedRef.current = Math.min(elapsedRef.current + delta, INTRO_DURATION)
+    const t = elapsedRef.current / INTRO_DURATION
+    // Approximate cubicBezier(0.16, 1, 0.3, 1) — fast-in, ease-out
+    const ease = 1 - Math.pow(1 - t, 3)
+    camera.position.lerpVectors(CAMERA_START, CAMERA_END, ease)
+    if (elapsedRef.current >= INTRO_DURATION) {
+      camera.position.copy(CAMERA_END)
+      doneRef.current = true
+    } else {
+      invalidate()
+    }
+  })
+
+  return null
+}
+
+// Calls invalidate() whenever solarLongitude changes so demand-mode re-renders
+function StoreInvalidator() {
+  const { invalidate } = useThree()
+  const solarLongitude = useSimulationStore(s => s.solarLongitude)
+
+  useEffect(() => {
+    invalidate()
+  }, [solarLongitude, invalidate])
+
+  return null
+}
+
+function StarBackground() {
+  return (
+    <>
+      <Stars radius={100} depth={50} count={3000} factor={3} saturation={0} fade />
+      <Stars
+        radius={80}
+        depth={30}
+        count={800}
+        factor={2}
+        saturation={0.3}
+        fade
+        // @ts-expect-error — drei Stars accepts rotation as a prop
+        rotation={[0.1, 0.3, 0]}
+      />
+      <Stars
+        radius={50}
+        depth={15}
+        count={200}
+        factor={5}
+        saturation={0.6}
+        fade
+        // @ts-expect-error — drei Stars accepts rotation as a prop
+        rotation={[0.2, -0.15, 0.1]}
+      />
+    </>
+  )
+}
 
 export function SolarCanvas() {
-  // TODO: implement
-  // <Canvas> from @react-three/fiber wraps the Three.js renderer
-  // SolarPosition.ts computes sun coordinates per frame
-  // EclipticPath.tsx draws the orbital plane
-  return null
+  const currentDate = useSimulationStore(s => s.currentDate)
+  const setSolarLongitude = useSimulationStore(s => s.setSolarLongitude)
+
+  // Keep solarLongitude in sync with currentDate (DateSlider writes currentDate;
+  // SimulationController will take over this write when it's implemented)
+  useEffect(() => {
+    setSolarLongitude(getVisualSolarAngle(currentDate))
+  }, [currentDate, setSolarLongitude])
+
+  return (
+    <div className="absolute inset-0">
+      <Canvas
+        dpr={[1, 2]}
+        frameloop="demand"
+        camera={{ position: [0, 22, 18], fov: 45 }}
+        gl={{ antialias: true, alpha: false }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(0x000008)
+        }}
+      >
+        <color attach="background" args={['#000008']} />
+        <ambientLight intensity={0.08} color="#0a1628" />
+
+        <Suspense fallback={null}>
+          <StarBackground />
+          <SunMesh />
+        </Suspense>
+
+        <CameraController />
+        <StoreInvalidator />
+
+        <OrbitControls
+          enableZoom={false}
+          enablePan={false}
+          minPolarAngle={Math.PI / 6}
+          maxPolarAngle={Math.PI / 2}
+          dampingFactor={0.05}
+          enableDamping
+          makeDefault
+        />
+      </Canvas>
+    </div>
+  )
 }
