@@ -8,6 +8,7 @@ import { useSimulationStore } from '@/app/store/simulationStore'
 import { EclipticRing } from './EclipticRing'
 import { ConstellationRegions } from './ConstellationRegions'
 import { ConstellationLabels } from './ConstellationLabels'
+import { NamedStars } from './NamedStars'
 import { SunOrbit } from './SunOrbit'
 import { SimulationController } from './SimulationController'
 
@@ -98,6 +99,7 @@ export function SolarCanvas() {
           <EclipticRing />
           <ConstellationRegions />
           <ConstellationLabels />
+          <NamedStars />
           <SunOrbit />
         </Suspense>
 

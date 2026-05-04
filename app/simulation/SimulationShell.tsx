@@ -2,6 +2,7 @@
 
 import { useUIStore } from '@/app/store/uiStore'
 import { useWebGLDetect } from '@/app/hooks/useWebGLDetect'
+import { useAmbientAudio } from '@/app/hooks/useAmbientAudio'
 import { SolarCanvas } from './SolarCanvas'
 import { SimulationFallback2D } from './SimulationFallback2D'
 import { SimulationSidePanel } from './SimulationSidePanel'
@@ -10,6 +11,7 @@ import { ExplorerControls } from './ExplorerControls'
 
 export function SimulationShell() {
   useWebGLDetect()
+  useAmbientAudio()
   const is2DFallback = useUIStore(s => s.is2DFallback)
 
   return (

@@ -2,16 +2,17 @@
 
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { DoubleSide } from 'three'
+import { BufferGeometry, DoubleSide, Float32BufferAttribute } from 'three'
 import type { MeshBasicMaterial } from 'three'
 import { useSimulationStore } from '@/app/store/simulationStore'
 import { useUIStore } from '@/app/store/uiStore'
 import { getConstellationAngleRanges } from '@/app/logic/eclipticAngles'
 import { getConstellationByDate } from '@/app/logic/zodiacLogic'
 
+const INNER_RADIUS = 4.6
+const OUTER_RADIUS = 5.4
 const INACTIVE_COLOR = '#1e3a6e'
 const INACTIVE_OPACITY = 0.18
-const INACTIVE_BOUNDARIES_OPACITY = 0.5
 const ACTIVE_COLOR = '#f59e0b'
 const ACTIVE_OPACITY = 0.70
 const OPHIUCHUS_INACTIVE_COLOR = '#3b0764'
@@ -25,6 +26,21 @@ export function ConstellationRegions() {
   const { invalidate } = useThree()
 
   const ranges = useMemo(() => getConstellationAngleRanges(), [])
+
+  // Boundary line geometry: one radial line segment per sector boundary (13 lines)
+  const boundaryGeometry = useMemo(() => {
+    const positions: number[] = []
+    for (const range of ranges) {
+      const θ = range.startDeg * (Math.PI / 180)
+      positions.push(
+        INNER_RADIUS * Math.cos(θ), 0, INNER_RADIUS * Math.sin(θ),
+        OUTER_RADIUS * Math.cos(θ), 0, OUTER_RADIUS * Math.sin(θ),
+      )
+    }
+    const geo = new BufferGeometry()
+    geo.setAttribute('position', new Float32BufferAttribute(positions, 3))
+    return geo
+  }, [ranges])
 
   const materialRefs = useRef<(MeshBasicMaterial | null)[]>(new Array(13).fill(null))
   const prevActiveRef = useRef<string>('')
@@ -46,7 +62,6 @@ export function ConstellationRegions() {
 
   useFrame((_, delta) => {
     const date = currentDateRef.current
-    const showBoundaries = showIAUBoundariesRef.current
     const activeName = getConstellationByDate(date).constellation.name
 
     if (activeName !== prevActiveRef.current) {
@@ -76,8 +91,7 @@ export function ConstellationRegions() {
         mat.color.set(isOphiuchus ? OPHIUCHUS_ACTIVE_COLOR : ACTIVE_COLOR)
       } else {
         mat.color.set(isOphiuchus ? OPHIUCHUS_INACTIVE_COLOR : INACTIVE_COLOR)
-        const inactiveOpacity = isOphiuchus ? OPHIUCHUS_INACTIVE_OPACITY : INACTIVE_OPACITY
-        mat.opacity = showBoundaries ? INACTIVE_BOUNDARIES_OPACITY : inactiveOpacity
+        mat.opacity = isOphiuchus ? OPHIUCHUS_INACTIVE_OPACITY : INACTIVE_OPACITY
       }
     })
 
@@ -97,7 +111,7 @@ export function ConstellationRegions() {
 
         return (
           <mesh key={range.name} rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[4.6, 5.4, 64, 1, thetaStart, thetaLength]} />
+            <ringGeometry args={[INNER_RADIUS, OUTER_RADIUS, 64, 1, thetaStart, thetaLength]} />
             <meshBasicMaterial
               ref={el => { materialRefs.current[i] = el }}
               color={INACTIVE_COLOR}
@@ -108,6 +122,13 @@ export function ConstellationRegions() {
           </mesh>
         )
       })}
+
+      {/* IAU boundary lines — thin radial segments at each sector edge, shown when mode is active */}
+      {showIAUBoundaries && (
+        <lineSegments geometry={boundaryGeometry}>
+          <lineBasicMaterial color="#475569" transparent opacity={0.7} />
+        </lineSegments>
+      )}
     </>
   )
 }
