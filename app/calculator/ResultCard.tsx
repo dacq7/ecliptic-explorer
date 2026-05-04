@@ -1,5 +1,6 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { CALCULATOR_COPY } from '@/app/content/explanations'
 import { useShareCard } from '@/app/hooks/useShareCard'
 import type { ZodiacResult } from '@/app/types'
@@ -16,7 +17,12 @@ export function ResultCard({ result }: ResultCardProps) {
   const isOphiuchus = constellation.name === 'Ophiuchus'
 
   return (
-    <div className="w-full max-w-lg rounded-2xl border border-amber-500/30 bg-[#0f0f2a] p-8 shadow-lg shadow-amber-500/10">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      className="w-full max-w-lg rounded-2xl border border-amber-500/30 bg-[#0f0f2a] p-8 shadow-lg shadow-[0_0_30px_rgba(245,158,11,0.15)]"
+    >
       {/* Reveal heading */}
       <p className="mb-1 text-sm font-semibold uppercase tracking-widest text-amber-400">
         {surprise ? CALCULATOR_COPY.surpriseHeading : CALCULATOR_COPY.matchHeading}
@@ -28,7 +34,7 @@ export function ResultCard({ result }: ResultCardProps) {
           {constellation.emoji}
         </span>
         <div>
-          <h2 className="text-3xl font-bold text-white">{constellation.nameEs}</h2>
+          <h2 className="font-display text-3xl font-bold text-white">{constellation.nameEs}</h2>
           <p className="text-sm text-zinc-400">{constellation.name}</p>
         </div>
       </div>
@@ -81,6 +87,6 @@ export function ResultCard({ result }: ResultCardProps) {
           {CALCULATOR_COPY.seeSimulationLabel}
         </a>
       </div>
-    </div>
+    </motion.div>
   )
 }

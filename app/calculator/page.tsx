@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import { useZodiac } from '@/app/hooks/useZodiac'
+import { useUserStore } from '@/app/store/userStore'
 import { ResultCard } from '@/app/calculator/ResultCard'
 import { CALCULATOR_COPY } from '@/app/content/explanations'
 
 export default function CalculatorPage() {
   const [dateInput, setDateInput] = useState('')
   const { calculate, result, isLoading, error } = useZodiac()
+  const reset = useUserStore((s) => s.reset)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -18,14 +20,14 @@ export default function CalculatorPage() {
 
   function handleReset() {
     setDateInput('')
-    calculate('')
+    reset()
   }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start bg-[#0a0a1a] px-4 py-16">
       {/* Page header */}
       <div className="mb-12 text-center">
-        <h1 className="mb-3 text-4xl font-bold tracking-tight text-white">
+        <h1 className="mb-3 font-display text-4xl font-bold tracking-tight text-white">
           {CALCULATOR_COPY.pageTitle}
         </h1>
         <p className="max-w-sm text-base leading-relaxed text-zinc-400">
