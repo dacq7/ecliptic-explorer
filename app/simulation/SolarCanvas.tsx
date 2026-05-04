@@ -5,8 +5,9 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, OrbitControls } from '@react-three/drei'
 import { Vector3 } from 'three'
 import { useSimulationStore } from '@/app/store/simulationStore'
-import { getVisualSolarAngle } from '@/app/logic/eclipticAngles'
-import { SunMesh } from './SunMesh'
+import { EclipticRing } from './EclipticRing'
+import { ConstellationRegions } from './ConstellationRegions'
+import { SunOrbit } from './SunOrbit'
 
 const CAMERA_START = new Vector3(0, 22, 18)
 const CAMERA_END = new Vector3(0, 12, 8)
@@ -76,15 +77,6 @@ function StarBackground() {
 }
 
 export function SolarCanvas() {
-  const currentDate = useSimulationStore(s => s.currentDate)
-  const setSolarLongitude = useSimulationStore(s => s.setSolarLongitude)
-
-  // Keep solarLongitude in sync with currentDate (DateSlider writes currentDate;
-  // SimulationController will take over this write when it's implemented)
-  useEffect(() => {
-    setSolarLongitude(getVisualSolarAngle(currentDate))
-  }, [currentDate, setSolarLongitude])
-
   return (
     <div className="absolute inset-0">
       <Canvas
@@ -101,7 +93,9 @@ export function SolarCanvas() {
 
         <Suspense fallback={null}>
           <StarBackground />
-          <SunMesh />
+          <EclipticRing />
+          <ConstellationRegions />
+          <SunOrbit />
         </Suspense>
 
         <CameraController />
