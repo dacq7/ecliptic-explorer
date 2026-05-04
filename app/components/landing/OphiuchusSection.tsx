@@ -8,7 +8,7 @@ export function OphiuchusSection() {
   const ref = useRef<HTMLElement>(null)
   const inView = useInView(ref, { once: true, margin: '-100px' })
 
-  const pills = ['Nov 30 – Dic 17', '18 días en la eclíptica', '13ª constelación']
+  const pills = ['Nov 30 – Dic 17', '18 días en la eclíptica']
 
   return (
     <section ref={ref} className="relative py-24 px-4 md:px-8">

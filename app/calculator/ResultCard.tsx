@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { CALCULATOR_COPY } from '@/app/content/explanations'
 import { useShareCard } from '@/app/hooks/useShareCard'
@@ -21,7 +22,7 @@ export function ResultCard({ result }: ResultCardProps) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="w-full max-w-lg rounded-2xl border border-amber-500/30 bg-[#0f0f2a] p-8 shadow-lg shadow-[0_0_30px_rgba(245,158,11,0.15)]"
+      className="w-full max-w-lg rounded-2xl border border-amber-500/30 bg-[#0f0f2a] p-8 shadow-[0_0_30px_rgba(245,158,11,0.15)]"
     >
       {/* Reveal heading */}
       <p className="mb-1 text-sm font-semibold uppercase tracking-widest text-amber-400">
@@ -80,12 +81,12 @@ export function ResultCard({ result }: ResultCardProps) {
           {copied ? CALCULATOR_COPY.shareCopied : CALCULATOR_COPY.shareLabel}
         </button>
 
-        <a
+        <Link
           href={`/simulation?date=${result.inputDate}`}
           className="flex-1 rounded-xl border border-zinc-600 px-5 py-3 text-center text-sm font-semibold text-zinc-200 transition-colors hover:border-zinc-400 hover:text-white"
         >
           {CALCULATOR_COPY.seeSimulationLabel}
-        </a>
+        </Link>
       </div>
     </motion.div>
   )

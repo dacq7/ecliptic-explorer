@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 export interface StarFieldProps {
   starCount?: number
   className?: string
+  'aria-hidden'?: boolean
 }
 
 interface Star {
