@@ -1,13 +1,6 @@
-/**
- * useShareCard — React hook for generating share card content.
- *
- * Produces the share text and (Phase 2) triggers the image generation
- * for premium users.
- *
- * TODO (Growth Hacker + Frontend Developer): Implement share text
- * generation once the copy is defined. Image generation is Phase 2.
- */
+'use client'
 
+import { useState, useCallback } from 'react'
 import type { ZodiacResult } from '@/app/types'
 
 export interface UseShareCardReturn {
@@ -17,20 +10,35 @@ export interface UseShareCardReturn {
   share: () => Promise<void>
   /** True if the Web Share API is available in this browser */
   canNativeShare: boolean
+  /** True for 2 s after a successful clipboard copy (not set on native share) */
+  copied: boolean
 }
 
-/**
- * TODO (Frontend Developer): Replace stub with real implementation.
- *
- * Implementation outline:
- *  1. Accept a ZodiacResult as parameter (or read from userStore).
- *  2. Format shareText using result.shareText from the logic layer.
- *  3. On share(): try navigator.share(), fall back to clipboard.writeText().
- *  4. Track share events for analytics (Growth Hacker defines the event schema).
- */
-export function useShareCard(_result: ZodiacResult | null): UseShareCardReturn {
-  throw new Error(
-    'useShareCard is not yet implemented. ' +
-      'See TODO comment in useShareCard.ts.'
-  )
+export function useShareCard(result: ZodiacResult | null): UseShareCardReturn {
+  const [copied, setCopied] = useState(false)
+
+  const shareText = result?.shareText ?? ''
+
+  const canNativeShare =
+    typeof navigator !== 'undefined' &&
+    typeof navigator.share === 'function'
+
+  const share = useCallback(async () => {
+    if (!shareText) return
+
+    if (canNativeShare) {
+      try {
+        await navigator.share({ text: shareText })
+        return
+      } catch {
+        // User cancelled or platform rejected — fall through to clipboard
+      }
+    }
+
+    await navigator.clipboard.writeText(shareText)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }, [shareText, canNativeShare])
+
+  return { shareText, share, canNativeShare, copied }
 }

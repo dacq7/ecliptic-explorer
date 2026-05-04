@@ -100,6 +100,11 @@ export function getTraditionalSign(mmdd: string): string {
 
 /**
  * Builds the shareText for a ZodiacResult.
+ *
+ * Three variants optimised for social virality:
+ *  - Ophiuchus: exclusivity + shocking stat (18 days) — highest share rate expected
+ *  - Mismatch: identity disruption ("me dijeron que era X") — drives curiosity
+ *  - Match: social FOMO ("la mayoría no tiene tanta suerte") — still worth sharing
  */
 function buildShareText(
   constellationNameEs: string,
@@ -110,19 +115,19 @@ function buildShareText(
 ): string {
   if (isOphiuchus) {
     return (
-      `Soy del signo real ${emoji} Ofiuco — el signo que la astrología ignoró. ` +
-      `¿Cuál es el tuyo? ecliptic-explorer.com`
+      `Descubrí que mi signo real es ${emoji} Ofiuco — la constelación que la astrología eliminó del zodíaco. ` +
+      `El Sol la recorre solo 18 días al año. ¿Y el tuyo? ecliptic-explorer.com #TuSignoReal`
     )
   }
   if (!isMatch) {
     return (
-      `Mi signo real es ${emoji} ${constellationNameEs}, no ${traditionalSign} como me dijeron. ` +
-      `La astronomía tiene 13 constelaciones. ¿Cuál es el tuyo? ecliptic-explorer.com`
+      `Mi signo real es ${emoji} ${constellationNameEs}, no ${traditionalSign} como siempre me dijeron. ` +
+      `La astronomía tiene 13 constelaciones. ¿Y el tuyo? ecliptic-explorer.com #TuSignoReal`
     )
   }
   return (
-    `Mi signo real es ${emoji} ${constellationNameEs} — coincide con la astrología. ` +
-    `Pero no todos tienen esa suerte. ¿Cuál es el tuyo? ecliptic-explorer.com`
+    `Mi signo real es ${emoji} ${constellationNameEs} — coincide con la astrología tradicional. ` +
+    `Pero la mayoría no tiene tanta suerte. ¿Y el tuyo? ecliptic-explorer.com #TuSignoReal`
   )
 }
 

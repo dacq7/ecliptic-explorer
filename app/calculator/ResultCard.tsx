@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { CALCULATOR_COPY } from '@/app/content/explanations'
+import { useShareCard } from '@/app/hooks/useShareCard'
 import type { ZodiacResult } from '@/app/types'
 
 interface ResultCardProps {
@@ -9,18 +9,11 @@ interface ResultCardProps {
 }
 
 export function ResultCard({ result }: ResultCardProps) {
-  const [copied, setCopied] = useState(false)
+  const { share, copied } = useShareCard(result)
 
-  const { constellation, traditionalSign, isMatch, surprise, shareText } = result
+  const { constellation, traditionalSign, isMatch, surprise } = result
 
   const isOphiuchus = constellation.name === 'Ophiuchus'
-
-  function handleShare() {
-    navigator.clipboard.writeText(shareText).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }
 
   return (
     <div className="w-full max-w-lg rounded-2xl border border-amber-500/30 bg-[#0f0f2a] p-8 shadow-lg shadow-amber-500/10">
@@ -75,7 +68,7 @@ export function ResultCard({ result }: ResultCardProps) {
       <div className="flex flex-col gap-3 sm:flex-row">
         <button
           type="button"
-          onClick={handleShare}
+          onClick={share}
           className="flex-1 rounded-xl bg-amber-500 px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-amber-400 active:bg-amber-600"
         >
           {copied ? CALCULATOR_COPY.shareCopied : CALCULATOR_COPY.shareLabel}
