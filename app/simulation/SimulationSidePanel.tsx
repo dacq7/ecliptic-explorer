@@ -159,7 +159,7 @@ export function SimulationSidePanel() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={togglePanel}
-            className="absolute top-[88px] right-5 w-9 h-9 rounded-lg flex items-center justify-center text-white/40 hover:text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
+            className="absolute top-[88px] right-5 w-9 h-9 rounded-lg hidden md:flex items-center justify-center text-white/40 hover:text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
             style={{
               background: 'rgba(0, 0, 8, 0.72)',
               backdropFilter: 'blur(12px)',
@@ -214,11 +214,6 @@ export function SimulationSidePanel() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              drag="y"
-              dragConstraints={{ top: 0 }}
-              onDragEnd={(_, info) => {
-                if (info.offset.y > 80) togglePanel()
-              }}
               className="absolute bottom-0 left-0 right-0 z-30 max-h-[60vh] overflow-y-auto md:hidden"
               style={{
                 background: isOphiuchus ? 'rgba(4, 0, 18, 0.92)' : 'rgba(0, 0, 8, 0.92)',
@@ -227,8 +222,17 @@ export function SimulationSidePanel() {
                 borderRadius: '20px 20px 0 0',
               }}
             >
-              {/* Drag handle */}
-              <div className="flex justify-center pt-2.5 pb-1">
+              {/* Drag handle — drag is restricted to this element to avoid conflicting with scroll */}
+              <motion.div
+                drag="y"
+                dragConstraints={{ top: 0, bottom: 120 }}
+                dragElastic={0.3}
+                onDragEnd={(_, info) => {
+                  if (info.offset.y > 80) togglePanel()
+                }}
+                className="flex justify-center pt-2.5 pb-1"
+                style={{ touchAction: 'none', cursor: 'grab' }}
+              >
                 <div
                   className="rounded-full"
                   style={{
@@ -237,7 +241,7 @@ export function SimulationSidePanel() {
                     background: 'rgba(255, 255, 255, 0.15)',
                   }}
                 />
-              </div>
+              </motion.div>
               <div className="px-5 pb-8">
                 <AnimatePresence mode="wait">
                   <PanelContent key={constellation.name} constellationName={constellation.name} />

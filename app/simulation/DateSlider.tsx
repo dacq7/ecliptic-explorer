@@ -34,9 +34,14 @@ export function DateSlider() {
   const year = new Date(currentDate + 'T12:00:00Z').getUTCFullYear()
   const dayOfYear = dateToDayOfYear(currentDate)
 
-  // Mobile auto-fade
+  // Mobile auto-fade — only active on small screens
+  const [isMobile, setIsMobile] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    setIsMobile(window.matchMedia('(max-width: 767px)').matches)
+  }, [])
 
   function resetFadeTimer() {
     setIsVisible(true)
@@ -45,12 +50,20 @@ export function DateSlider() {
   }
 
   useEffect(() => {
+    if (!isMobile) return
     resetFadeTimer()
     return () => {
       if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMobile])
+
+  // Reset timer when playback starts so the slider stays visible
+  useEffect(() => {
+    if (!isMobile || !isPlaying) return
+    resetFadeTimer()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlaying, isMobile])
 
   function handleSliderChange(e: React.ChangeEvent<HTMLInputElement>) {
     const day = parseInt(e.target.value, 10)
@@ -69,10 +82,8 @@ export function DateSlider() {
         opacity: undefined,
       }}
     >
-      {/* Mobile fade overlay — applied only on small screens via inline style workaround */}
       <div
-        className="md:opacity-100"
-        style={{ opacity: isVisible ? 1 : 0.35, transition: 'opacity 600ms' }}
+        style={{ opacity: isMobile && !isVisible ? 0.35 : 1, transition: 'opacity 600ms' }}
         onPointerEnter={resetFadeTimer}
         onPointerMove={resetFadeTimer}
       >

@@ -52,29 +52,34 @@ function StoreInvalidator() {
 }
 
 function StarBackground() {
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
   return (
     <>
-      <Stars radius={100} depth={50} count={3000} factor={3} saturation={0} fade />
-      <Stars
-        radius={80}
-        depth={30}
-        count={800}
-        factor={2}
-        saturation={0.3}
-        fade
-        // @ts-expect-error — drei Stars accepts rotation as a prop
-        rotation={[0.1, 0.3, 0]}
-      />
-      <Stars
-        radius={50}
-        depth={15}
-        count={200}
-        factor={5}
-        saturation={0.6}
-        fade
-        // @ts-expect-error — drei Stars accepts rotation as a prop
-        rotation={[0.2, -0.15, 0.1]}
-      />
+      <Stars radius={100} depth={50} count={isMobile ? 500 : 3000} factor={3} saturation={0} fade />
+      {!isMobile && (
+        <>
+          <Stars
+            radius={80}
+            depth={30}
+            count={800}
+            factor={2}
+            saturation={0.3}
+            fade
+            // @ts-expect-error — drei Stars accepts rotation as a prop
+            rotation={[0.1, 0.3, 0]}
+          />
+          <Stars
+            radius={50}
+            depth={15}
+            count={200}
+            factor={5}
+            saturation={0.6}
+            fade
+            // @ts-expect-error — drei Stars accepts rotation as a prop
+            rotation={[0.2, -0.15, 0.1]}
+          />
+        </>
+      )}
     </>
   )
 }

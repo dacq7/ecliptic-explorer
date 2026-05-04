@@ -9,6 +9,10 @@ import { longitudeToPosition } from '@/app/simulation/SolarPosition'
 
 const LABEL_RADIUS = 6.5
 
+// On mobile viewports only the 5 most recognizable constellations render
+// to avoid label clutter with Scorpius/Ophiuchus tightly packed sectors
+const MOBILE_PRIORITY = new Set(['Virgo', 'Scorpius', 'Ophiuchus', 'Sagittarius', 'Leo'])
+
 const SPECIAL_SUBLABELS: Record<string, string> = {
   Virgo: '44 días · la más larga',
   Scorpius: '7 días · la más corta',
@@ -35,6 +39,7 @@ export function ConstellationLabels() {
   const showIAUBoundaries = useUIStore(s => s.showIAUBoundaries)
   const { constellation: activeConstellation } = useConstellationHighlight()
   const ranges = getConstellationAngleRanges()
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
 
   return (
     <>
@@ -42,8 +47,11 @@ export function ConstellationLabels() {
         const range = ranges.find(r => r.name === c.name)
         if (!range) return null
 
-        const pos = longitudeToPosition(range.midDeg, LABEL_RADIUS)
         const isActive = activeConstellation.name === c.name
+        // On mobile, skip non-priority labels unless this is the active constellation
+        if (isMobile && !MOBILE_PRIORITY.has(c.name) && !isActive) return null
+
+        const pos = longitudeToPosition(range.midDeg, LABEL_RADIUS)
         const isOphiuchus = c.name === 'Ophiuchus'
 
         const sublabel = showIAUBoundaries

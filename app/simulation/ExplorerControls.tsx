@@ -3,6 +3,11 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useUIStore } from '@/app/store/uiStore'
+import { useSimulationStore } from '@/app/store/simulationStore'
+import type { TimeSpeed } from '@/app/store/simulationStore'
+
+const SPEEDS: TimeSpeed[] = [1, 10, 365]
+const SPEED_LABELS: Record<TimeSpeed, string> = { 1: '1×', 10: '10×', 365: '365×' }
 
 interface Toggle {
   key: string
@@ -33,7 +38,7 @@ function PillToggle({ label, active, onToggle }: Omit<Toggle, 'key'>) {
  * and ambient audio.
  *
  * Desktop: vertical stack on the left, vertically centered.
- * Mobile: hidden behind a floating ⚙ button.
+ * Mobile: hidden behind a floating ⚙ button. Speed buttons included in popup.
  */
 export function ExplorerControls() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -44,6 +49,9 @@ export function ExplorerControls() {
   const toggleIAUBoundaries = useUIStore(s => s.toggleIAUBoundaries)
   const toggleStarNames = useUIStore(s => s.toggleStarNames)
   const toggleAudio = useUIStore(s => s.toggleAudio)
+
+  const speed = useSimulationStore(s => s.speed)
+  const setSpeed = useSimulationStore(s => s.setSpeed)
 
   const toggles: Toggle[] = [
     { key: 'iau', label: 'Límites IAU', active: showIAUBoundaries, onToggle: toggleIAUBoundaries },
@@ -70,7 +78,7 @@ export function ExplorerControls() {
         ⚙
       </button>
 
-      {/* Mobile: animated popup */}
+      {/* Mobile: animated popup with toggles + speed buttons */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -83,6 +91,26 @@ export function ExplorerControls() {
             {toggles.map(({ key, label, active, onToggle }) => (
               <PillToggle key={key} label={label} active={active} onToggle={onToggle} />
             ))}
+
+            {/* Speed buttons */}
+            <div className="flex gap-1 pt-1 border-t border-white/10">
+              {SPEEDS.map(s => (
+                <button
+                  key={s}
+                  onClick={() => setSpeed(s)}
+                  aria-label={`Velocidad ${SPEED_LABELS[s]}`}
+                  aria-pressed={speed === s}
+                  className={[
+                    'flex-1 py-1.5 rounded text-xs font-medium transition-all border',
+                    speed === s
+                      ? 'bg-amber-500/20 border-amber-500/50 text-amber-400'
+                      : 'bg-black/50 border-white/10 text-white/40',
+                  ].join(' ')}
+                >
+                  {SPEED_LABELS[s]}
+                </button>
+              ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
