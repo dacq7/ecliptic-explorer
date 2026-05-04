@@ -1,37 +1,63 @@
-/**
- * StarField — animated background component for the landing hero.
- *
- * Implemented with CSS animations and random positioning — NOT Three.js.
- * Three.js is reserved for the /simulation route only.
- * Keeping this as pure CSS/HTML avoids loading a 3D runtime on the landing page.
- *
- * Performance contract: must not block LCP. Stars are decorative, so
- * they use aria-hidden and have no impact on accessibility tree.
- *
- * TODO (Frontend Developer / Whimsy Injector): Implement the star particle
- * system. Suggested approach: generate N pseudo-random star positions
- * deterministically (seeded) to avoid hydration mismatches in SSR.
- */
+'use client'
+
+import { useState, useEffect } from 'react'
 
 export interface StarFieldProps {
-  /** Number of star particles to render (default: 200) */
   starCount?: number
-  /** CSS class to apply to the container */
   className?: string
 }
 
+interface Star {
+  id: number
+  left: number
+  top: number
+  large: boolean
+  opacity: number
+  duration: number
+  bright: boolean
+}
+
 export function StarField({ starCount = 200, className = '' }: StarFieldProps) {
-  // TODO: implement star generation
-  // Hydration note: use a deterministic seed for random positions,
-  // or generate stars client-side only (useEffect) to avoid SSR mismatch.
-  void starCount
+  const [stars, setStars] = useState<Star[]>([])
+
+  useEffect(() => {
+    const generated: Star[] = Array.from({ length: starCount }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      large: Math.random() < 0.2,
+      opacity: ([0.2, 0.4, 0.6, 0.8] as const)[Math.floor(Math.random() * 4)],
+      duration: 2 + Math.random() * 4,
+      bright: i < 4,
+    }))
+    setStars(generated)
+  }, [starCount])
 
   return (
     <div
       aria-hidden="true"
       className={['absolute inset-0 overflow-hidden pointer-events-none', className].join(' ')}
     >
-      {/* TODO: render star elements here */}
+      {stars.map((star) =>
+        star.bright ? (
+          <div
+            key={star.id}
+            className="absolute w-1 h-1 rounded-full bg-white animate-pulse"
+            style={{ left: `${star.left}%`, top: `${star.top}%` }}
+          />
+        ) : (
+          <div
+            key={star.id}
+            className={`absolute rounded-full bg-white ${star.large ? 'w-[2px] h-[2px]' : 'w-[1px] h-[1px]'}`}
+            style={{
+              left: `${star.left}%`,
+              top: `${star.top}%`,
+              opacity: star.opacity,
+              animation: `twinkle ${star.duration.toFixed(1)}s ease-in-out infinite`,
+            }}
+          />
+        )
+      )}
     </div>
   )
 }

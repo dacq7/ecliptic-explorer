@@ -72,3 +72,9 @@ body {
   color: var(--color-stellar-100);
   font-family: var(--font-sans);
 }
+
+/* ── StarField animation ── */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50%       { opacity: 1; }
+}
