@@ -103,7 +103,12 @@ export function DurationBar({ constellation, maxDays, index }: DurationBarProps)
         aria-expanded={expanded}
         tabIndex={0}
         onClick={() => setExpanded(p => !p)}
-        onKeyDown={(e) => e.key === 'Enter' && setExpanded(p => !p)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setExpanded(p => !p)
+          }
+        }}
         className={`w-full rounded-xl px-4 py-3 flex items-center gap-4 cursor-pointer transition-colors duration-150 ${ROW_BG[type]}`}
       >
         {/* Label */}

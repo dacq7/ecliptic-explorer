@@ -4,7 +4,6 @@ import { useRef } from 'react'
 import Link from 'next/link'
 import { motion, useInView, type Variants } from 'framer-motion'
 
-import { Button } from '@/app/components/shared/Button'
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -55,14 +54,11 @@ export function CTASection() {
             transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
           />
 
-          <Link href="/calculator">
-            <Button
-              variant="primary"
-              size="lg"
-              className="min-w-[260px] shadow-[0_0_40px_rgba(251,191,36,0.5)] transition-shadow duration-300 hover:shadow-[0_0_60px_rgba(251,191,36,0.7)] sm:w-auto"
-            >
-              Descubre tu signo real
-            </Button>
+          <Link
+            href="/calculator"
+            className="inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 bg-amber-500 text-black hover:bg-amber-400 focus-visible:ring-amber-500 h-14 px-8 text-lg min-w-[260px] shadow-[0_0_40px_rgba(251,191,36,0.5)] transition-shadow duration-300 hover:shadow-[0_0_60px_rgba(251,191,36,0.7)] sm:w-auto"
+          >
+            Descubre tu signo real
           </Link>
 
           <p className="text-xs text-slate-600">

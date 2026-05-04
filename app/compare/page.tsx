@@ -3,7 +3,6 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import Link from 'next/link'
-import { Button } from '@/app/components/shared/Button'
 import { SIGN_COMPARISONS } from '@/app/content/comparisons'
 import { CONSTELLATIONS } from '@/app/logic/constellations'
 import { ComparisonTable } from '@/app/components/compare/ComparisonTable'
@@ -110,14 +109,11 @@ export default function ComparePage() {
           <br />
           Descubre cuál es tu constelación real.
         </p>
-        <Link href="/calculator">
-          <Button
-            variant="primary"
-            size="lg"
-            className="shadow-[0_0_32px_rgba(251,191,36,0.3)] hover:shadow-[0_0_48px_rgba(251,191,36,0.5)] transition-shadow duration-300"
-          >
-            Descubre tu constelación real
-          </Button>
+        <Link
+          href="/calculator"
+          className="inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 bg-amber-500 text-black hover:bg-amber-400 focus-visible:ring-amber-500 h-14 px-8 text-lg shadow-[0_0_32px_rgba(251,191,36,0.3)] hover:shadow-[0_0_48px_rgba(251,191,36,0.5)] transition-shadow duration-300"
+        >
+          Descubre tu constelación real
         </Link>
         <p className="mt-4 text-xs text-slate-600">
           Gratis · Sin registro · Datos oficiales IAU

@@ -120,7 +120,7 @@ export function ComparisonTable({ comparisons, ophiuchus }: ComparisonTableProps
                   className={`border-b border-white/[0.05] last:border-b-0 transition-colors duration-100 cursor-default ${cfg.rowHover}`}
                   style={{ borderLeft: `2px solid ${cfg.rowBorderColor}` }}
                 >
-                  <td className="px-4 py-3.5">
+                  <th scope="row" className="px-4 py-3.5 font-normal text-left">
                     <div className="flex items-center gap-2">
                       <span className="text-base" aria-hidden="true">
                         {emojiByName[comparison.astronomicalConstellation] ?? '⭐'}
@@ -129,7 +129,7 @@ export function ComparisonTable({ comparisons, ophiuchus }: ComparisonTableProps
                         {comparison.traditionalSign}
                       </span>
                     </div>
-                  </td>
+                  </th>
                   <td className="px-4 py-3.5 text-sm text-slate-400">{comparison.traditionalRange}</td>
                   <td className="px-4 py-3.5">
                     <span className="text-sm font-display font-semibold text-white">
@@ -161,7 +161,7 @@ export function ComparisonTable({ comparisons, ophiuchus }: ComparisonTableProps
                 borderBottom: '1px solid rgba(139,92,246,0.1)',
               }}
             >
-              <td className="px-4 py-4">
+              <th scope="row" className="px-4 py-4 font-normal text-left">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-base" aria-hidden="true">🐍</span>
                   <span className="font-display text-sm font-bold text-violet-300">{ophiuchus.nameEs}</span>
@@ -169,7 +169,7 @@ export function ComparisonTable({ comparisons, ophiuchus }: ComparisonTableProps
                     IGNORADA
                   </span>
                 </div>
-              </td>
+              </th>
               <td className="px-4 py-4 text-sm text-slate-600 italic">No existe en astrología</td>
               <td className="px-4 py-4">
                 <span className="font-display text-sm font-semibold text-violet-300">{ophiuchus.nameEs}</span>
@@ -198,7 +198,7 @@ export function ComparisonTable({ comparisons, ophiuchus }: ComparisonTableProps
                   className={`border-b border-white/[0.05] last:border-b-0 transition-colors duration-100 cursor-default ${cfg.rowHover}`}
                   style={{ borderLeft: `2px solid ${cfg.rowBorderColor}` }}
                 >
-                  <td className="px-4 py-3.5">
+                  <th scope="row" className="px-4 py-3.5 font-normal text-left">
                     <div className="flex items-center gap-2">
                       <span className="text-base" aria-hidden="true">
                         {emojiByName[comparison.astronomicalConstellation] ?? '⭐'}
@@ -207,7 +207,7 @@ export function ComparisonTable({ comparisons, ophiuchus }: ComparisonTableProps
                         {comparison.traditionalSign}
                       </span>
                     </div>
-                  </td>
+                  </th>
                   <td className="px-4 py-3.5 text-sm text-slate-400">{comparison.traditionalRange}</td>
                   <td className="px-4 py-3.5">
                     <span className="text-sm font-display font-semibold text-white">

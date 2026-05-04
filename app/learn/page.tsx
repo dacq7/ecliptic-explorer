@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { CONSTELLATION_EXPLANATIONS } from '@/app/content/explanations'
 import { OphiuchusCard } from '@/app/components/learn/OphiuchusCard'
 import { ConceptAccordion } from '@/app/components/learn/ConceptAccordion'
-import { Button } from '@/app/components/shared/Button'
 
 export default function LearnPage() {
   const ophiuchus = CONSTELLATION_EXPLANATIONS['Ophiuchus']
@@ -54,14 +53,11 @@ export default function LearnPage() {
         <p className="text-slate-400 text-sm md:text-base mb-8 leading-relaxed">
           Ahora que entiendes cómo funciona el zodíaco real, descubre en qué constelación estaba el Sol el día que naciste.
         </p>
-        <Link href="/calculator">
-          <Button
-            variant="primary"
-            size="lg"
-            className="shadow-[0_0_32px_rgba(251,191,36,0.3)] hover:shadow-[0_0_48px_rgba(251,191,36,0.5)] transition-shadow duration-300"
-          >
-            Descubre tu constelación real
-          </Button>
+        <Link
+          href="/calculator"
+          className="inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 bg-amber-500 text-black hover:bg-amber-400 focus-visible:ring-amber-500 h-14 px-8 text-lg shadow-[0_0_32px_rgba(251,191,36,0.3)] hover:shadow-[0_0_48px_rgba(251,191,36,0.5)] transition-shadow duration-300"
+        >
+          Descubre tu constelación real
         </Link>
         <p className="mt-4 text-xs text-slate-600">
           Gratis · Sin registro · Datos oficiales IAU

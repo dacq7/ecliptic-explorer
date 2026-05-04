@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { motion, type Variants } from 'framer-motion'
 import { StarField } from '@/app/components/shared/StarField'
-import { Button } from '@/app/components/shared/Button'
 
 const containerVariants: Variants = {
   hidden: {},
@@ -54,19 +53,17 @@ export function HeroSection() {
           variants={itemVariants}
           className="flex flex-col sm:flex-row gap-3 mt-2 justify-center"
         >
-          <Link href="/calculator">
-            <Button
-              variant="primary"
-              size="lg"
-              className="shadow-[0_0_24px_rgba(251,191,36,0.4)] hover:shadow-[0_0_40px_rgba(251,191,36,0.6)] transition-shadow"
-            >
-              Descubre el real
-            </Button>
+          <Link
+            href="/calculator"
+            className="inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 bg-amber-500 text-black hover:bg-amber-400 focus-visible:ring-amber-500 h-14 px-8 text-lg shadow-[0_0_24px_rgba(251,191,36,0.4)] hover:shadow-[0_0_40px_rgba(251,191,36,0.6)] transition-shadow"
+          >
+            Descubre el real
           </Link>
-          <Link href="/simulation">
-            <Button variant="secondary" size="lg">
-              Ver la simulación
-            </Button>
+          <Link
+            href="/simulation"
+            className="inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 border border-white/20 bg-transparent text-white hover:bg-white/10 focus-visible:ring-white h-14 px-8 text-lg"
+          >
+            Ver la simulación
           </Link>
         </motion.div>
       </motion.div>

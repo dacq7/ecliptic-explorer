@@ -78,6 +78,11 @@ export function ProofSection() {
                   </span>
                   <div className="flex-1 bg-white/5 rounded-full h-2.5 overflow-hidden">
                     <motion.div
+                      role="progressbar"
+                      aria-valuenow={c.durationDays}
+                      aria-valuemin={0}
+                      aria-valuemax={MAX_DAYS}
+                      aria-label={`${c.nameEs}: ${c.durationDays} días`}
                       className={`h-full rounded-full ${isExtreme ? 'bg-amber-400' : 'bg-blue-400/50'}`}
                       initial={{ width: '0%' }}
                       animate={inView ? { width: widthPct } : { width: '0%' }}
