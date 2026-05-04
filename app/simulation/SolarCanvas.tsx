@@ -7,6 +7,7 @@ import { Vector3 } from 'three'
 import { useSimulationStore } from '@/app/store/simulationStore'
 import { EclipticRing } from './EclipticRing'
 import { ConstellationRegions } from './ConstellationRegions'
+import { ConstellationLabels } from './ConstellationLabels'
 import { SunOrbit } from './SunOrbit'
 
 const CAMERA_START = new Vector3(0, 22, 18)
@@ -95,6 +96,7 @@ export function SolarCanvas() {
           <StarBackground />
           <EclipticRing />
           <ConstellationRegions />
+          <ConstellationLabels />
           <SunOrbit />
         </Suspense>
 
