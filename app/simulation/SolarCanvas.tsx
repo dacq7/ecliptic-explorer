@@ -13,8 +13,8 @@ import { SunOrbit } from './SunOrbit'
 import { SimulationController } from './SimulationController'
 import { WebGLContextGuard } from './WebGLContextGuard'
 
-const CAMERA_START = new Vector3(0, 22, 18)
-const CAMERA_END = new Vector3(0, 12, 8)
+const CAMERA_START = new Vector3(0, 16, 12)
+const CAMERA_END = new Vector3(0, 10, 7)
 const CAMERA_START_MOBILE = new Vector3(0, 28, 22)
 const CAMERA_END_MOBILE = new Vector3(0, 18, 14)
 const CAMERA_START_PHONE = new Vector3(0, 35, 28)
