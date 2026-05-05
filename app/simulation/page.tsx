@@ -10,7 +10,10 @@ export const metadata: Metadata = {
 
 export default function SimulationPage() {
   return (
-    <main className="relative w-full h-screen bg-[#000008] overflow-hidden">
+    <main
+      className="relative flex-1 min-h-0 w-full bg-[#000008] overflow-hidden"
+      style={{ paddingTop: 0, marginTop: 0 }}
+    >
       <Suspense fallback={<SimulationLoadingFallback />}>
         <SimulationShell />
       </Suspense>

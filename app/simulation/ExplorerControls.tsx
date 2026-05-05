@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useUIStore } from '@/app/store/uiStore'
 import { useSimulationStore } from '@/app/store/simulationStore'
@@ -42,6 +42,14 @@ function PillToggle({ label, active, onToggle }: Omit<Toggle, 'key'>) {
  */
 export function ExplorerControls() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [isLandscapePhone, setIsLandscapePhone] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(orientation: landscape) and (max-height: 500px)')
+    setIsLandscapePhone(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsLandscapePhone(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   const showIAUBoundaries = useUIStore(s => s.showIAUBoundaries)
   const showStarNames = useUIStore(s => s.showStarNames)
@@ -70,7 +78,7 @@ export function ExplorerControls() {
 
       {/* Mobile: floating ⚙ button */}
       <button
-        className="md:hidden absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 backdrop-blur border border-white/10 text-white/50 flex items-center justify-center"
+        className={`md:hidden absolute left-4 ${isLandscapePhone ? 'top-[76px]' : 'top-1/2 -translate-y-1/2'} w-10 h-10 rounded-full bg-black/60 backdrop-blur border border-white/10 text-white/50 flex items-center justify-center`}
         onClick={() => setMobileOpen(v => !v)}
         aria-label="Opciones del modo explorador"
         aria-expanded={mobileOpen}
@@ -86,7 +94,7 @@ export function ExplorerControls() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -8 }}
             transition={{ duration: 0.18 }}
-            className="md:hidden absolute left-16 top-1/2 -translate-y-1/2 flex flex-col gap-2 bg-black/80 backdrop-blur border border-white/10 rounded-xl p-3"
+            className={`md:hidden absolute left-16 ${isLandscapePhone ? 'top-[76px]' : 'top-1/2 -translate-y-1/2'} flex flex-col gap-2 bg-black/80 backdrop-blur border border-white/10 rounded-xl p-3`}
           >
             {toggles.map(({ key, label, active, onToggle }) => (
               <PillToggle key={key} label={label} active={active} onToggle={onToggle} />

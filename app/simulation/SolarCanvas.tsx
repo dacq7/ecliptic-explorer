@@ -18,7 +18,7 @@ const CAMERA_END = new Vector3(0, 10, 7)
 const CAMERA_START_MOBILE = new Vector3(0, 28, 22)
 const CAMERA_END_MOBILE = new Vector3(0, 18, 14)
 const CAMERA_START_PHONE = new Vector3(0, 35, 28)
-const CAMERA_END_PHONE = new Vector3(0, 22, 18)
+const CAMERA_END_PHONE = new Vector3(0, 26, 20)
 const INTRO_DURATION = 2.5
 
 function CameraController({ start, end }: { start: Vector3; end: Vector3 }) {
@@ -112,7 +112,7 @@ export function SolarCanvas() {
   }, [])
 
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-0" style={{ touchAction: 'none' }}>
       <Canvas
         dpr={[1, viewportWidth < 640 ? 1.5 : 2]}
         frameloop="demand"
@@ -131,7 +131,7 @@ export function SolarCanvas() {
           <EclipticRing />
           <ConstellationRegions />
           <ConstellationLabels />
-          {viewportWidth >= 640 && <NamedStars />}
+          <NamedStars />
           <SunOrbit />
         </Suspense>
 

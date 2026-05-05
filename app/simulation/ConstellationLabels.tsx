@@ -52,25 +52,25 @@ export function ConstellationLabels() {
         const pos = longitudeToPosition(range.midDeg, LABEL_RADIUS)
         const isOphiuchus = c.name === 'Ophiuchus'
 
-        // Phone (< 480px): active shows emoji 26px + name in Spanish, inactive emoji 20px/opacity 0.5
+        // Phone (< 480px): distanceFactor 12 reduces per-distance scale variance
         if (isPhone) {
           return (
             <Html
               key={c.name}
               position={[pos.x, pos.y, pos.z]}
               center
-              distanceFactor={8}
+              distanceFactor={12}
               style={{ pointerEvents: 'none' }}
             >
               {isActive ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', userSelect: 'none', lineHeight: 1 }}>
-                  <div style={{ fontSize: '34px' }}>{c.emoji}</div>
-                  <div style={{ fontSize: '15px', fontWeight: 600, color: '#F59E0B', textShadow: '0 0 8px rgba(245,158,11,0.8)', background: 'rgba(0,0,0,0.6)', padding: '2px 6px', borderRadius: '4px', marginTop: '3px', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontSize: '42px', lineHeight: 1, filter: 'drop-shadow(0 0 6px rgba(245,158,11,0.8))' }}>{c.emoji}</div>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#F59E0B', background: 'rgba(0,0,0,0.65)', padding: '2px 8px', borderRadius: '10px', marginTop: '3px', whiteSpace: 'nowrap' }}>
                     {c.nameEs}
                   </div>
                 </div>
               ) : (
-                <div style={{ fontSize: '24px', opacity: 0.5, userSelect: 'none', lineHeight: 1 }}>
+                <div style={{ fontSize: '28px', opacity: 0.75, userSelect: 'none', lineHeight: 1 }}>
                   {c.emoji}
                 </div>
               )}

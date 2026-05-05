@@ -145,6 +145,15 @@ export function SimulationSidePanel() {
     setIsPhone(window.matchMedia('(max-width: 479px)').matches)
   }, [])
 
+  const [isLandscapePhone, setIsLandscapePhone] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(orientation: landscape) and (max-height: 500px)')
+    setIsLandscapePhone(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsLandscapePhone(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
   const isOphiuchus = constellation.name === 'Ophiuchus'
 
   const panelBg = isOphiuchus
@@ -165,7 +174,7 @@ export function SimulationSidePanel() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={togglePanel}
-            className="absolute top-[88px] right-5 w-9 h-9 rounded-lg hidden md:flex items-center justify-center text-white/40 hover:text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
+            className={`absolute top-[88px] right-5 w-9 h-9 rounded-lg ${isLandscapePhone ? 'flex' : 'hidden md:flex'} items-center justify-center text-white/40 hover:text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70`}
             style={{
               background: 'rgba(0, 0, 8, 0.72)',
               backdropFilter: 'blur(12px)',
@@ -186,13 +195,17 @@ export function SimulationSidePanel() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="absolute top-[80px] right-5 w-[280px] max-h-[calc(100vh-120px)] overflow-y-auto z-10 hidden md:block"
+            className={`absolute overflow-y-auto z-10 ${isLandscapePhone ? 'block' : 'hidden md:block'}`}
             style={{
               background: panelBg,
               backdropFilter: 'blur(16px) saturate(160%)',
               border: `1px solid ${panelBorder}`,
               borderRadius: '16px',
               padding: '20px',
+              top: isLandscapePhone ? '64px' : '80px',
+              right: '20px',
+              width: isLandscapePhone ? '200px' : '280px',
+              maxHeight: isLandscapePhone ? 'calc(100vh - 80px)' : 'calc(100vh - 120px)',
             }}
           >
             <AnimatePresence mode="wait">
@@ -211,22 +224,21 @@ export function SimulationSidePanel() {
           (at z-auto) and triggers a double-toggle that traps the panel open.
         */}
         <motion.div
-          animate={{ opacity: isPanelOpen ? 1 : 0 }}
+          animate={{ opacity: isPanelOpen && !isLandscapePhone ? 1 : 0 }}
           transition={{ duration: 0.15 }}
           className="absolute inset-0 z-20 md:hidden"
-          style={{ pointerEvents: isPanelOpen ? 'auto' : 'none' }}
-          onClick={togglePanel}
+          style={{ pointerEvents: 'none' }}
           aria-hidden
         />
 
         <AnimatePresence>
-          {isPanelOpen && (
+          {isPanelOpen && !isLandscapePhone && (
             <motion.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className={`absolute bottom-0 left-0 right-0 z-30 overflow-y-auto md:hidden ${isPhone ? 'max-h-[45vh]' : 'max-h-[60vh]'}`}
+              className={`absolute bottom-0 left-0 right-0 z-30 overflow-y-auto md:hidden ${isPhone ? 'max-h-[35vh]' : 'max-h-[60vh]'}`}
               style={{
                 background: isOphiuchus ? 'rgba(4, 0, 18, 0.92)' : 'rgba(0, 0, 8, 0.92)',
                 backdropFilter: 'blur(20px)',
@@ -269,7 +281,7 @@ export function SimulationSidePanel() {
           isPanelOpen turns false, with no dependency on animation timing. */}
       <motion.button
         initial={{ opacity: 0 }}
-        animate={{ opacity: isPanelOpen ? 0 : 1 }}
+        animate={{ opacity: isPanelOpen || isLandscapePhone ? 0 : 1 }}
         transition={{ duration: 0.2 }}
         onClick={togglePanel}
         className="absolute top-[88px] right-5 w-9 h-9 rounded-lg flex items-center justify-center text-white/40 hover:text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 md:hidden z-40"
@@ -277,7 +289,7 @@ export function SimulationSidePanel() {
           background: 'rgba(0, 0, 8, 0.72)',
           backdropFilter: 'blur(12px)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
-          pointerEvents: isPanelOpen ? 'none' : 'auto',
+          pointerEvents: isPanelOpen || isLandscapePhone ? 'none' : 'auto',
         }}
         aria-label="Abrir panel de información"
       >

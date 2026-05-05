@@ -39,12 +39,21 @@ export function DateSlider() {
   // Mobile auto-fade — only active on small screens
   const [isMobile, setIsMobile] = useState(false)
   const [isPhone, setIsPhone] = useState(false)
+  const [isLandscapePhone, setIsLandscapePhone] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     setIsMobile(window.matchMedia('(max-width: 767px)').matches)
     setIsPhone(window.matchMedia('(max-width: 479px)').matches)
+  }, [])
+
+  useEffect(() => {
+    const mq = window.matchMedia('(orientation: landscape) and (max-height: 500px)')
+    setIsLandscapePhone(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsLandscapePhone(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
   }, [])
 
   function resetFadeTimer() {
@@ -83,10 +92,12 @@ export function DateSlider() {
 
   return (
     <div
-      className="absolute left-1/2 -translate-x-1/2 z-10 transition-opacity duration-[600ms] md:opacity-100"
+      className={`absolute z-10 transition-opacity duration-[600ms] md:opacity-100 ${isLandscapePhone ? '' : 'left-1/2 -translate-x-1/2'}`}
       style={{
-        bottom: '32px',
-        width: 'min(520px, calc(100vw - 48px))',
+        bottom: isLandscapePhone ? '16px' : '32px',
+        ...(isLandscapePhone
+          ? { left: '16px', right: '232px', width: 'auto' }
+          : { width: 'min(520px, calc(100vw - 48px))' }),
         opacity: undefined,
       }}
     >
@@ -106,13 +117,13 @@ export function DateSlider() {
         >
           {/* Row: play + slider + speeds */}
           <div className="flex items-center gap-3">
-            {/* Play/Pause */}
+            {/* Play/Pause — hidden on phone portrait (replaced by floating button in SimulationShell) */}
             <button
               onClick={togglePlay}
-              className="shrink-0 flex items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
+              className={`shrink-0 ${isPhone ? 'hidden' : 'flex'} items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70`}
               style={{
-                width: isPhone ? '44px' : '36px',
-                height: isPhone ? '44px' : '36px',
+                width: '36px',
+                height: '36px',
                 background: 'rgba(245, 158, 11, 0.12)',
                 border: '1px solid rgba(245, 158, 11, 0.25)',
                 color: '#f59e0b',
