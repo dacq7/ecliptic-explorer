@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useUIStore } from '@/app/store/uiStore'
@@ -139,6 +140,11 @@ export function SimulationSidePanel() {
   const togglePanel = useUIStore(s => s.togglePanel)
   const { constellation } = useConstellationHighlight()
 
+  const [isPhone, setIsPhone] = useState(false)
+  useEffect(() => {
+    setIsPhone(window.matchMedia('(max-width: 479px)').matches)
+  }, [])
+
   const isOphiuchus = constellation.name === 'Ophiuchus'
 
   const panelBg = isOphiuchus
@@ -197,24 +203,30 @@ export function SimulationSidePanel() {
       </AnimatePresence>
 
       {/* Mobile bottom sheet */}
-      <AnimatePresence>
-        {isPanelOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="absolute inset-0 z-20 md:hidden"
-              onClick={togglePanel}
-            />
+      <>
+        {/*
+          Backdrop: always in the DOM on mobile, controls its own opacity and
+          pointer-events. This avoids the AnimatePresence timing bug where the
+          fading-out backdrop (still at z-20) intercepts taps on the ℹ button
+          (at z-auto) and triggers a double-toggle that traps the panel open.
+        */}
+        <motion.div
+          animate={{ opacity: isPanelOpen ? 1 : 0 }}
+          transition={{ duration: 0.15 }}
+          className="absolute inset-0 z-20 md:hidden"
+          style={{ pointerEvents: isPanelOpen ? 'auto' : 'none' }}
+          onClick={togglePanel}
+          aria-hidden
+        />
+
+        <AnimatePresence>
+          {isPanelOpen && (
             <motion.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="absolute bottom-0 left-0 right-0 z-30 max-h-[60vh] overflow-y-auto md:hidden"
+              className={`absolute bottom-0 left-0 right-0 z-30 overflow-y-auto md:hidden ${isPhone ? 'max-h-[45vh]' : 'max-h-[60vh]'}`}
               style={{
                 background: isOphiuchus ? 'rgba(4, 0, 18, 0.92)' : 'rgba(0, 0, 8, 0.92)',
                 backdropFilter: 'blur(20px)',
@@ -248,31 +260,29 @@ export function SimulationSidePanel() {
                 </AnimatePresence>
               </div>
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </>
 
-      {/* Mobile info button when panel is closed */}
-      <AnimatePresence>
-        {!isPanelOpen && (
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={togglePanel}
-            className="absolute top-[88px] right-5 w-9 h-9 rounded-lg flex items-center justify-center text-white/40 hover:text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 md:hidden"
-            style={{
-              background: 'rgba(0, 0, 8, 0.72)',
-              backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-            }}
-            aria-label="Abrir panel de información"
-          >
-            ℹ
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {/* Mobile info button — always in DOM at z-40 to stay above the exiting bottom sheet (z-30).
+          pointerEvents driven by React state (not animation) so it becomes clickable the instant
+          isPanelOpen turns false, with no dependency on animation timing. */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isPanelOpen ? 0 : 1 }}
+        transition={{ duration: 0.2 }}
+        onClick={togglePanel}
+        className="absolute top-[88px] right-5 w-9 h-9 rounded-lg flex items-center justify-center text-white/40 hover:text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 md:hidden z-40"
+        style={{
+          background: 'rgba(0, 0, 8, 0.72)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          pointerEvents: isPanelOpen ? 'none' : 'auto',
+        }}
+        aria-label="Abrir panel de información"
+      >
+        ℹ
+      </motion.button>
     </>
   )
 }

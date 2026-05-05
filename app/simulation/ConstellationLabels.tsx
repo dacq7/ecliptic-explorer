@@ -40,6 +40,7 @@ export function ConstellationLabels() {
   const { constellation: activeConstellation } = useConstellationHighlight()
   const ranges = getConstellationAngleRanges()
   const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+  const isPhone = typeof window !== 'undefined' && window.matchMedia('(max-width: 479px)').matches
 
   return (
     <>
@@ -48,11 +49,37 @@ export function ConstellationLabels() {
         if (!range) return null
 
         const isActive = activeConstellation.name === c.name
-        // On mobile, skip non-priority labels unless this is the active constellation
-        if (isMobile && !MOBILE_PRIORITY.has(c.name) && !isActive) return null
-
         const pos = longitudeToPosition(range.midDeg, LABEL_RADIUS)
         const isOphiuchus = c.name === 'Ophiuchus'
+
+        // Phone (< 480px): active shows emoji 26px + name in Spanish, inactive emoji 20px/opacity 0.5
+        if (isPhone) {
+          return (
+            <Html
+              key={c.name}
+              position={[pos.x, pos.y, pos.z]}
+              center
+              distanceFactor={8}
+              style={{ pointerEvents: 'none' }}
+            >
+              {isActive ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', userSelect: 'none', lineHeight: 1 }}>
+                  <div style={{ fontSize: '34px' }}>{c.emoji}</div>
+                  <div style={{ fontSize: '15px', fontWeight: 600, color: '#F59E0B', textShadow: '0 0 8px rgba(245,158,11,0.8)', background: 'rgba(0,0,0,0.6)', padding: '2px 6px', borderRadius: '4px', marginTop: '3px', whiteSpace: 'nowrap' }}>
+                    {c.nameEs}
+                  </div>
+                </div>
+              ) : (
+                <div style={{ fontSize: '24px', opacity: 0.5, userSelect: 'none', lineHeight: 1 }}>
+                  {c.emoji}
+                </div>
+              )}
+            </Html>
+          )
+        }
+
+        // Mobile (< 768px): only priority labels + active
+        if (isMobile && !MOBILE_PRIORITY.has(c.name) && !isActive) return null
 
         const sublabel = showIAUBoundaries
           ? IAU_SUBLABELS[c.name]

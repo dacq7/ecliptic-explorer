@@ -2,9 +2,11 @@
 
 import { motion } from 'framer-motion'
 import { useSimulationStore } from '@/app/store/simulationStore'
-import { getConstellationAngleRanges } from '@/app/logic/eclipticAngles'
+import { useUIStore } from '@/app/store/uiStore'
+import { getConstellationAngleRanges, getVisualSolarAngle } from '@/app/logic/eclipticAngles'
 import { CONSTELLATIONS } from '@/app/logic/constellations'
 import { getConstellationByDate } from '@/app/logic/zodiacLogic'
+import { useSimulationTick } from '@/app/hooks/useSimulationTick'
 
 const CX = 200
 const CY = 200
@@ -14,17 +16,18 @@ const R_SUN = 131
 
 const RANGES = getConstellationAngleRanges()
 
-// Pre-computed star dots (deterministic, no Math.random at render time)
-const STAR_DOTS = Array.from({ length: 60 }, (_, i) => ({
+// Deterministic star field — no Math.random at render time.
+// Uses a quasi-random low-discrepancy sequence for even coverage.
+// Opacity range 0.20–0.72 ensures stars are visible on dark backgrounds.
+const STAR_DOTS = Array.from({ length: 120 }, (_, i) => ({
   cx: ((i * 137.508 + 23) % 390) + 5,
   cy: ((i * 97.31 + 41) % 390) + 5,
-  r: i % 7 === 0 ? 1.2 : 0.7,
-  opacity: 0.08 + (i % 5) * 0.04,
+  r: i % 13 === 0 ? 2.0 : i % 7 === 0 ? 1.4 : i % 3 === 0 ? 1.0 : 0.7,
+  opacity: 0.20 + (i % 8) * 0.065, // 0.20 → 0.72
 }))
 
 /**
  * Converts a visual angle (90° = top, clockwise) to SVG [x, y] coordinates.
- * Formula: clock_deg = visual_deg - 90; x = CX + r*sin(clock), y = CY - r*cos(clock)
  */
 function visualToXY(visualDeg: number, r: number): [number, number] {
   const rad = (visualDeg - 90) * (Math.PI / 180)
@@ -48,16 +51,23 @@ function sectorPath(startDeg: number, endDeg: number): string {
 }
 
 export function SimulationFallback2D() {
-  const solarLongitude = useSimulationStore(s => s.solarLongitude)
+  // Drive the animation loop — mirrors SimulationController but uses RAF, not useFrame
+  useSimulationTick()
+
   const currentDate = useSimulationStore(s => s.currentDate)
+  const showIAUBoundaries = useUIStore(s => s.showIAUBoundaries)
 
   const activeConstellation = getConstellationByDate(currentDate).constellation
-  const [sunX, sunY] = visualToXY(solarLongitude, R_SUN)
+
+  // Compute sun position directly from currentDate — solarLongitude in the store
+  // is only kept in sync by SimulationController (3D), so we derive it ourselves here.
+  const visualAngle = getVisualSolarAngle(currentDate)
+  const [sunX, sunY] = visualToXY(visualAngle, R_SUN)
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full bg-[#000008]">
       <p className="text-center mb-4 text-xs text-slate-600 font-mono">
-        Modo 2D — WebGL no disponible en este dispositivo
+        Modo 2D — WebGL no disponible en este navegador
       </p>
       <div
         className="w-full max-w-[480px] aspect-square rounded-2xl overflow-hidden"
@@ -77,7 +87,6 @@ export function SimulationFallback2D() {
 
           {/* Constellation sectors */}
           {RANGES.map(range => {
-            const constellation = CONSTELLATIONS.find(c => c.name === range.name)
             const isActive = activeConstellation.name === range.name
             const isOphiuchus = range.name === 'Ophiuchus'
             const fill = isActive ? '#f59e0b' : isOphiuchus ? '#7c3aed' : '#1e3a6e'
@@ -95,6 +104,24 @@ export function SimulationFallback2D() {
             )
           })}
 
+          {/* IAU boundary lines — one radial line per sector edge */}
+          {showIAUBoundaries && RANGES.map(range => {
+            const [x1, y1] = visualToXY(range.startDeg, R_INNER)
+            const [x2, y2] = visualToXY(range.startDeg, R_OUTER)
+            return (
+              <line
+                key={`boundary-${range.name}`}
+                x1={x1.toFixed(2)}
+                y1={y1.toFixed(2)}
+                x2={x2.toFixed(2)}
+                y2={y2.toFixed(2)}
+                stroke="rgba(255,255,255,0.30)"
+                strokeWidth="0.8"
+                strokeDasharray="3 2"
+              />
+            )
+          })}
+
           {/* Ecliptic ring */}
           <circle
             cx={CX}
@@ -103,7 +130,7 @@ export function SimulationFallback2D() {
             fill="none"
             stroke="#3b82f6"
             strokeWidth="0.5"
-            strokeOpacity="0.3"
+            strokeOpacity={showIAUBoundaries ? 0.55 : 0.30}
           />
 
           {/* Sun — animated with spring physics on position change */}
@@ -145,6 +172,29 @@ export function SimulationFallback2D() {
               </text>
             )
           })()}
+
+          {/* IAU sector labels — shown when boundaries are active */}
+          {showIAUBoundaries && RANGES.map(range => {
+            const con = CONSTELLATIONS.find(c => c.name === range.name)
+            if (!con) return null
+            const isActive = activeConstellation.name === range.name
+            if (isActive) return null // active label already rendered above
+            const [lx, ly] = visualToXY(range.midDeg, R_INNER - 18)
+            return (
+              <text
+                key={`label-${range.name}`}
+                x={lx.toFixed(2)}
+                y={ly.toFixed(2)}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize="9"
+                fill={range.name === 'Ophiuchus' ? '#a78bfa' : 'rgba(255,255,255,0.35)'}
+                opacity="0.8"
+              >
+                {con.emoji}
+              </text>
+            )
+          })}
         </svg>
       </div>
     </div>

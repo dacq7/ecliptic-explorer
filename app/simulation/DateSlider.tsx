@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSimulationStore } from '@/app/store/simulationStore'
 import { dateToDayOfYear, dayOfYearToDate } from '@/app/simulation/TimeEngine'
+import { getVisualSolarAngle } from '@/app/logic/eclipticAngles'
 import type { TimeSpeed } from '@/app/store/simulationStore'
 
 const MONTHS_ES = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC']
@@ -28,6 +29,7 @@ export function DateSlider() {
   const isPlaying = useSimulationStore(s => s.isPlaying)
   const speed = useSimulationStore(s => s.speed)
   const setDate = useSimulationStore(s => s.setDate)
+  const setSolarLongitude = useSimulationStore(s => s.setSolarLongitude)
   const setSpeed = useSimulationStore(s => s.setSpeed)
   const togglePlay = useSimulationStore(s => s.togglePlay)
 
@@ -36,11 +38,13 @@ export function DateSlider() {
 
   // Mobile auto-fade — only active on small screens
   const [isMobile, setIsMobile] = useState(false)
+  const [isPhone, setIsPhone] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     setIsMobile(window.matchMedia('(max-width: 767px)').matches)
+    setIsPhone(window.matchMedia('(max-width: 479px)').matches)
   }, [])
 
   function resetFadeTimer() {
@@ -67,7 +71,11 @@ export function DateSlider() {
 
   function handleSliderChange(e: React.ChangeEvent<HTMLInputElement>) {
     const day = parseInt(e.target.value, 10)
-    setDate(dayOfYearToDate(day, year))
+    const newDate = dayOfYearToDate(day, year)
+    setDate(newDate)
+    // Keep solarLongitude in sync so SidePanel shows the correct ecliptic angle
+    // even in 2D fallback mode (where SimulationController is not running).
+    setSolarLongitude(getVisualSolarAngle(newDate))
     resetFadeTimer()
   }
 
@@ -93,7 +101,7 @@ export function DateSlider() {
             backdropFilter: 'blur(12px) saturate(180%)',
             border: '1px solid rgba(255, 255, 255, 0.06)',
             borderRadius: '12px',
-            padding: '12px 20px',
+            padding: isPhone ? '16px 14px' : '12px 20px',
           }}
         >
           {/* Row: play + slider + speeds */}
@@ -103,8 +111,8 @@ export function DateSlider() {
               onClick={togglePlay}
               className="shrink-0 flex items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
               style={{
-                width: '36px',
-                height: '36px',
+                width: isPhone ? '44px' : '36px',
+                height: isPhone ? '44px' : '36px',
                 background: 'rgba(245, 158, 11, 0.12)',
                 border: '1px solid rgba(245, 158, 11, 0.25)',
                 color: '#f59e0b',
