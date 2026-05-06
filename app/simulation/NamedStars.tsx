@@ -38,36 +38,10 @@ const NAMED_STARS: StarDef[] = [
   { constellation: 'Ophiuchus',   name: 'Sabik',           nameLatin: 'η Ophiuchi',    magnitude: 2.43, ra: 17.1730, dec: -15.7249 },
 ]
 
-const STAR_RING_RADIUS = 7.5
-const ECLIPTIC_OBLIQUITY = 23.4393 * (Math.PI / 180)
-// ♈ equinox falls at canvas angle ≈ 180.7° (inside Pisces, not Aries IAU boundary).
-// Derived: θ_VE = 90° + (92/365.25)×360° where 92 = days from Dec-18 to Mar-20.
-// See .claude/arch-star-positioning-01.md §3.2 for full derivation.
-const CANVAS_VERNAL_EQUINOX_DEG = 180.7
+import { raDecToCanvasXYZ } from './utils/raDecToCanvas'
 
 function raDecToCanvas(ra: number, dec: number): [number, number, number] {
-  const raRad  = ra  * (Math.PI / 12)
-  const decRad = dec * (Math.PI / 180)
-  const ε = ECLIPTIC_OBLIQUITY
-
-  // Step 1: equatorial (RA/Dec) → ecliptic (λ, β)
-  const sinBeta = Math.sin(decRad) * Math.cos(ε) - Math.cos(decRad) * Math.sin(ε) * Math.sin(raRad)
-  const beta = Math.asin(Math.max(-1, Math.min(1, sinBeta)))
-
-  const lambdaY = Math.sin(decRad) * Math.sin(ε) + Math.cos(decRad) * Math.cos(ε) * Math.sin(raRad)
-  const lambdaX = Math.cos(decRad) * Math.cos(raRad)
-  const lambdaDeg = ((Math.atan2(lambdaY, lambdaX) * 180 / Math.PI) + 360) % 360
-
-  // Step 2: λ → canvas angle (anchored at vernal equinox)
-  const thetaDeg = (CANVAS_VERNAL_EQUINOX_DEG + lambdaDeg) % 360
-  const theta = thetaDeg * (Math.PI / 180)
-
-  // Step 3: canvas XYZ
-  return [
-    Math.cos(theta) * STAR_RING_RADIUS,
-    (beta * 180 / Math.PI) * 0.15,
-    Math.sin(theta) * STAR_RING_RADIUS,
-  ]
+  return raDecToCanvasXYZ(ra, dec)
 }
 
 function magnitudeToSize(mag: number): number {

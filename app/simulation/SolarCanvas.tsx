@@ -5,6 +5,9 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, OrbitControls } from '@react-three/drei'
 import { Vector3 } from 'three'
 import { useSimulationStore } from '@/app/store/simulationStore'
+import { useUIStore } from '@/app/store/uiStore'
+import { getConstellationByDate } from '@/app/logic/zodiacLogic'
+import { ConstellationAsterisms } from './ConstellationAsterisms'
 import { EclipticRing } from './EclipticRing'
 import { ConstellationRegions } from './ConstellationRegions'
 import { ConstellationLabels } from './ConstellationLabels'
@@ -54,6 +57,19 @@ function StoreInvalidator() {
   }, [solarLongitude, invalidate])
 
   return null
+}
+
+function AsterismsWrapper() {
+  const currentDate = useSimulationStore(s => s.currentDate)
+  const showConstellationLines = useUIStore(s => s.showConstellationLines)
+  const activeConstellation = getConstellationByDate(currentDate).constellation.name
+
+  return (
+    <ConstellationAsterisms
+      activeConstellation={activeConstellation}
+      visible={showConstellationLines}
+    />
+  )
 }
 
 function StarBackground() {
@@ -132,6 +148,7 @@ export function SolarCanvas() {
           <ConstellationRegions />
           <ConstellationLabels />
           <NamedStars />
+          <AsterismsWrapper />
           <SunOrbit />
         </Suspense>
 

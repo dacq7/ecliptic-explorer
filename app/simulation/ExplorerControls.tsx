@@ -51,9 +51,11 @@ export function ExplorerControls() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
+  const showConstellationLines = useUIStore(s => s.showConstellationLines)
   const showIAUBoundaries = useUIStore(s => s.showIAUBoundaries)
   const showStarNames = useUIStore(s => s.showStarNames)
   const showAudio = useUIStore(s => s.showAudio)
+  const toggleConstellationLines = useUIStore(s => s.toggleConstellationLines)
   const toggleIAUBoundaries = useUIStore(s => s.toggleIAUBoundaries)
   const toggleStarNames = useUIStore(s => s.toggleStarNames)
   const toggleAudio = useUIStore(s => s.toggleAudio)
@@ -62,6 +64,7 @@ export function ExplorerControls() {
   const setSpeed = useSimulationStore(s => s.setSpeed)
 
   const toggles: Toggle[] = [
+    { key: 'lines', label: 'Líneas de constelación', active: showConstellationLines, onToggle: toggleConstellationLines },
     { key: 'iau', label: 'Límites IAU', active: showIAUBoundaries, onToggle: toggleIAUBoundaries },
     { key: 'stars', label: 'Nombres de estrellas', active: showStarNames, onToggle: toggleStarNames },
     { key: 'audio', label: 'Audio ambiental', active: showAudio, onToggle: toggleAudio },
