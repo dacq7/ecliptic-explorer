@@ -3,9 +3,29 @@ import { SimulationShell } from './SimulationShell'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Simulación 3D | Ecliptic Explorer',
+  title: 'Simulación 3D del Plano Eclíptico',
   description:
-    'El Sol moviéndose a través de las 13 constelaciones reales de la eclíptica. Visualización astronómica interactiva basada en los límites oficiales de la IAU.',
+    'El Sol moviéndose por las 13 constelaciones reales. Simulación astronómica interactiva con datos IAU. Mueve el tiempo, observa la eclíptica en 3D.',
+  keywords: [
+    'simulación eclíptica interactiva',
+    'plano eclíptico 3D',
+    'movimiento del sol constelaciones',
+    'eclíptica zodíaco',
+    'astronomía interactiva',
+    'sistema solar eclíptica',
+    'constelaciones IAU',
+  ],
+  openGraph: {
+    title: 'El Sol, moviéndose por las 13 constelaciones. En tiempo real.',
+    description:
+      'Simulación 3D del plano eclíptico con datos oficiales IAU. Escorpio aparece 7 días. Ofiuco aparece 18. Virgo domina 44. Muévelo tú mismo.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'El Sol, moviéndose por las 13 constelaciones. En tiempo real.',
+    description:
+      'Simulación 3D del plano eclíptico con datos oficiales IAU. Escorpio aparece 7 días. Ofiuco aparece 18. Virgo domina 44. Muévelo tú mismo.',
+  },
 }
 
 export default function SimulationPage() {

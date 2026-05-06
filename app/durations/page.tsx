@@ -1,6 +1,33 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CONSTELLATIONS } from '@/app/logic/constellations'
 import { DurationBar } from '@/app/components/durations/DurationBar'
+
+export const metadata: Metadata = {
+  title: 'Virgo dura 44 días. Escorpio, 7. El zodíaco real.',
+  description:
+    'La astrología asigna 30 días a cada signo. La eclíptica no. Virgo: 44 días. Cáncer: 21. Escorpio: 7. Los períodos reales según la IAU, visualizados.',
+  keywords: [
+    'duración signos zodiacales real',
+    'cuántos días dura escorpio',
+    'virgo 44 días eclíptica',
+    'períodos reales constelaciones',
+    'escorpio 7 días astronomía',
+    'constelaciones duración IAU',
+    'zodíaco desigual',
+  ],
+  openGraph: {
+    title: 'La astrología le da 30 días a cada signo. La eclíptica no.',
+    description:
+      'Virgo: 44 días en la eclíptica. Escorpio: 7 días. Ofiuco: 18 días, sin aparecer en ningún horóscopo. La duración real de las 13 constelaciones, visualizada.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Virgo: 44 días. Escorpio: 7 días. El mismo zodíaco.',
+    description:
+      'La astrología le asigna 30 días iguales a cada signo. La eclíptica hace lo que quiere. Datos oficiales IAU.',
+  },
+}
 
 export default function DurationsPage() {
   const sorted = [...CONSTELLATIONS].sort((a, b) => b.durationDays - a.durationDays)

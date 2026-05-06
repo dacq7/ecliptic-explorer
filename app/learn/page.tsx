@@ -1,13 +1,83 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CONSTELLATION_EXPLANATIONS } from '@/app/content/explanations'
 import { OphiuchusCard } from '@/app/components/learn/OphiuchusCard'
 import { ConceptAccordion } from '@/app/components/learn/ConceptAccordion'
+
+export const metadata: Metadata = {
+  title: 'Qué es la Eclíptica: 13 Constelaciones, Ofiuco y Precesión',
+  description:
+    'Por qué hay 13 constelaciones y no 12. Por qué Escorpio dura solo 7 días. Qué es la precesión y por qué tu signo cambió. Explicado con datos IAU.',
+  keywords: [
+    'qué es la eclíptica',
+    'por qué hay 13 signos zodiacales',
+    'ofiuco por qué se ignora',
+    'precesión de los equinoccios zodíaco',
+    'eclíptica explicada',
+    'constelaciones zodíaco astronomía',
+    'por qué escorpio dura 7 días',
+  ],
+  openGraph: {
+    title: 'Cuatro preguntas que el zodíaco nunca te respondió.',
+    description:
+      '¿Por qué hay 13 constelaciones? ¿Por qué Escorpio dura 7 días? ¿Qué es la precesión? ¿Por qué tu signo cambió? Las respuestas, con datos astronómicos reales.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cuatro preguntas que el zodíaco nunca te respondió.',
+    description:
+      '¿Por qué hay 13 constelaciones? ¿Por qué Escorpio dura 7 días? ¿Qué es la precesión? Las respuestas, con datos IAU.',
+  },
+}
+
+const learnFaqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la eclíptica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La eclíptica es el camino aparente que el Sol recorre alrededor de la Tierra a lo largo del año. Las constelaciones que ese plano cruza son las del zodíaco — y son 13, no 12. La eclíptica está inclinada 23.5 grados respecto al ecuador, el mismo ángulo que origina las estaciones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué hay 13 constelaciones en el zodíaco y no 12?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La Unión Astronómica Internacional trazó los límites reales del cielo en 1930. El plano de la eclíptica cruza 13 constelaciones — incluyendo Ofiuco, que la astrología nunca incluyó. La astrología eligió 12 signos iguales de 30 grados hace 2.600 años. La IAU reconoce 88 constelaciones en total; solo 13 están en el camino del Sol.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué Escorpio dura solo 7 días en la eclíptica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La eclíptica no divide el cielo en partes iguales — cada constelación ocupa un área diferente. Escorpio ocupa un tramo pequeño del plano solar: apenas 7 días, frente a los 44 de Virgo. La astrología compensó esa desigualdad dándole 30 días a todos. Escorpio es seis veces más corto que Virgo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la precesión de los equinoccios?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La Tierra no gira erguida — su eje oscila lentamente en un ciclo de 26.000 años. En 2.600 años, ese movimiento desplazó las constelaciones del zodíaco casi un mes completo. Por eso el signo astrológico y la constelación real ya no coinciden. El desfase actual es de casi 30 grados.',
+      },
+    },
+  ],
+}
 
 export default function LearnPage() {
   const ophiuchus = CONSTELLATION_EXPLANATIONS['Ophiuchus']
 
   return (
     <main className="bg-[#0a0a1a] min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(learnFaqJsonLd) }}
+      />
       {/* HERO */}
       <section className="pt-24 pb-16 px-4 md:px-8 max-w-3xl mx-auto text-center">
         <p className="text-amber-400 text-xs font-medium uppercase tracking-[0.2em] mb-4">
