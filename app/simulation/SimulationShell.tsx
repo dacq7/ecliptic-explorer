@@ -6,6 +6,7 @@ import { useUIStore } from '@/app/store/uiStore'
 import { useSimulationStore } from '@/app/store/simulationStore'
 import { useWebGLDetect } from '@/app/hooks/useWebGLDetect'
 import { useAmbientAudio } from '@/app/hooks/useAmbientAudio'
+import { useLayoutMode } from '@/app/hooks/useLayoutMode'
 import { SolarCanvas } from './SolarCanvas'
 import { SimulationFallback2D } from './SimulationFallback2D'
 import { SimulationSidePanel } from './SimulationSidePanel'
@@ -21,25 +22,16 @@ export function SimulationShell() {
   const isPlaying = useSimulationStore(s => s.isPlaying)
   const togglePlay = useSimulationStore(s => s.togglePlay)
 
-  const [isPhone, setIsPhone] = useState(false)
-  useEffect(() => {
-    setIsPhone(window.matchMedia('(max-width: 479px)').matches)
-  }, [])
+  const { isPhone, isLandscapePhone, isPortraitPhone } = useLayoutMode()
 
-  const [isPortraitPhone, setIsPortraitPhone] = useState(false)
   const [isDismissed, setIsDismissed] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia('(orientation: portrait) and (max-width: 767px)')
-    setIsPortraitPhone(mq.matches)
-    const handler = (e: MediaQueryListEvent) => {
-      setIsPortraitPhone(e.matches)
-      if (!e.matches) setIsDismissed(false)
-    }
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
 
-  // Drag hint — shown for 3s on mobile, then fades out
+  // Reset the portrait invitation when the device leaves portrait mode
+  useEffect(() => {
+    if (!isPortraitPhone) setIsDismissed(false)
+  }, [isPortraitPhone])
+
+  // Drag hint — shown for 3s on portrait mobile (< 768px), then fades out
   const [showDragHint, setShowDragHint] = useState(true)
   useEffect(() => {
     if (!window.matchMedia('(max-width: 767px)').matches) {
@@ -56,7 +48,7 @@ export function SimulationShell() {
       role="img"
       aria-label="Simulación del plano eclíptico. El Sol se mueve por las 13 constelaciones reales según la fecha seleccionada."
     >
-      {/* Portrait invitation — phone portrait only, dismissible */}
+      {/* Portrait invitation — portrait phone/tablet only, dismissible */}
       {isPortraitPhone && !isDismissed && (
         <PortraitInvitation onDismiss={() => setIsDismissed(true)} />
       )}
@@ -69,8 +61,9 @@ export function SimulationShell() {
         <div className="pointer-events-auto">
           <ExplorerControls />
           <SimulationSidePanel />
-          {/* Phone-only: floating play/pause — top-right, below the ℹ info button */}
-          {isPhone && (
+
+          {/* Portrait phone only: floating play/pause below the ℹ info button */}
+          {isPhone && !isLandscapePhone && (
             <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -101,14 +94,48 @@ export function SimulationShell() {
               )}
             </motion.button>
           )}
-          {/* Hidden on mobile when bottom sheet is open — slider trapped behind z-30 sheet */}
-          <div className={isPanelOpen ? 'hidden md:block' : ''}>
+
+          {/* Landscape phone only: compact floating play/pause at top-right of canvas area */}
+          {isLandscapePhone && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.3 }}
+              onClick={togglePlay}
+              className="absolute z-20 flex items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
+              style={{
+                top: '8px',
+                right: '188px',
+                width: '32px',
+                height: '32px',
+                background: 'rgba(245, 158, 11, 0.12)',
+                border: '1px solid rgba(245, 158, 11, 0.25)',
+                color: '#f59e0b',
+                pointerEvents: 'auto',
+              }}
+              aria-label={isPlaying ? 'Pausar animación solar' : 'Reproducir animación solar'}
+            >
+              {isPlaying ? (
+                <svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor">
+                  <rect x="0" y="0" width="3" height="12" rx="1" />
+                  <rect x="7" y="0" width="3" height="12" rx="1" />
+                </svg>
+              ) : (
+                <svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor">
+                  <path d="M0 0 L10 6 L0 12 Z" />
+                </svg>
+              )}
+            </motion.button>
+          )}
+
+          {/* DateSlider — hidden on portrait mobile when bottom sheet is open */}
+          <div className={isPanelOpen && !isLandscapePhone ? 'hidden md:block' : ''}>
             <DateSlider />
           </div>
         </div>
       </div>
 
-      {/* Drag hint — mobile only, auto-dismisses after 3s */}
+      {/* Drag hint — portrait mobile only, auto-dismisses after 3s */}
       <AnimatePresence>
         {showDragHint && (
           <motion.div

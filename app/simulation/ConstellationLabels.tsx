@@ -3,13 +3,14 @@
 import { Html } from '@react-three/drei'
 import { useUIStore } from '@/app/store/uiStore'
 import { useConstellationHighlight } from '@/app/hooks/useConstellationHighlight'
+import { useLayoutMode } from '@/app/hooks/useLayoutMode'
 import { getConstellationAngleRanges } from '@/app/logic/eclipticAngles'
 import { CONSTELLATIONS } from '@/app/logic/constellations'
 import { longitudeToPosition } from '@/app/simulation/SolarPosition'
 
 const LABEL_RADIUS = 6.5
 
-// On mobile viewports only the 5 most recognizable constellations render
+// On portrait mobile viewports only the 5 most recognizable constellations render
 // to avoid label clutter with Scorpius/Ophiuchus tightly packed sectors
 const MOBILE_PRIORITY = new Set(['Virgo', 'Scorpius', 'Ophiuchus', 'Sagittarius', 'Leo'])
 
@@ -38,9 +39,11 @@ const IAU_SUBLABELS: Record<string, string> = {
 export function ConstellationLabels() {
   const showIAUBoundaries = useUIStore(s => s.showIAUBoundaries)
   const { constellation: activeConstellation } = useConstellationHighlight()
+  const { isPhone, isLandscapePhone, isPortraitPhone } = useLayoutMode()
   const ranges = getConstellationAngleRanges()
-  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
-  const isPhone = typeof window !== 'undefined' && window.matchMedia('(max-width: 479px)').matches
+
+  // Portrait tablet/phone filter — landscape handled separately via early return per label
+  const isMobile = isPortraitPhone
 
   return (
     <>
@@ -50,10 +53,9 @@ export function ConstellationLabels() {
 
         const isActive = activeConstellation.name === c.name
         const pos = longitudeToPosition(range.midDeg, LABEL_RADIUS)
-        const isOphiuchus = c.name === 'Ophiuchus'
 
-        // Phone (< 480px): distanceFactor 12 reduces per-distance scale variance
-        if (isPhone) {
+        // Portrait phone (< 480px): large emoji labels
+        if (isPhone && !isLandscapePhone) {
           return (
             <Html
               key={c.name}
@@ -78,9 +80,46 @@ export function ConstellationLabels() {
           )
         }
 
-        // Mobile (< 768px): only priority labels + active
+        // Landscape phone: compact emoji labels — 36px active, 22px inactive
+        if (isLandscapePhone) {
+          return (
+            <Html
+              key={c.name}
+              position={[pos.x, pos.y, pos.z]}
+              center
+              distanceFactor={7}
+              style={{ pointerEvents: 'none' }}
+            >
+              {isActive ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', userSelect: 'none', lineHeight: 1 }}>
+                  <div style={{ fontSize: '36px', lineHeight: 1 }}>{c.emoji}</div>
+                  <div style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: '#F59E0B',
+                    textShadow: '0 0 6px rgba(245,158,11,0.7)',
+                    background: 'rgba(0,0,0,0.60)',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    marginTop: '3px',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {c.nameEs}
+                  </div>
+                </div>
+              ) : (
+                <div style={{ fontSize: '22px', opacity: 0.45, userSelect: 'none', lineHeight: 1 }}>
+                  {c.emoji}
+                </div>
+              )}
+            </Html>
+          )
+        }
+
+        // Portrait tablet (480–767px): only priority labels + active
         if (isMobile && !MOBILE_PRIORITY.has(c.name) && !isActive) return null
 
+        const isOphiuchus = c.name === 'Ophiuchus'
         const sublabel = showIAUBoundaries
           ? IAU_SUBLABELS[c.name]
           : SPECIAL_SUBLABELS[c.name]

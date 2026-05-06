@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useUIStore } from '@/app/store/uiStore'
 import { useSimulationStore } from '@/app/store/simulationStore'
 import { useConstellationHighlight } from '@/app/hooks/useConstellationHighlight'
+import { useLayoutMode } from '@/app/hooks/useLayoutMode'
 
 function formatMonthDay(mmdd: string): string {
   const [mm, dd] = mmdd.split('-')
@@ -13,6 +14,7 @@ function formatMonthDay(mmdd: string): string {
   return `${parseInt(dd)} ${months[parseInt(mm) - 1]}`
 }
 
+// Full panel content — used for desktop and portrait mobile bottom sheet
 function PanelContent({ constellationName }: { constellationName: string }) {
   const { constellation } = useConstellationHighlight()
   const showIAUBoundaries = useUIStore(s => s.showIAUBoundaries)
@@ -135,37 +137,114 @@ function PanelContent({ constellationName }: { constellationName: string }) {
   )
 }
 
+// Compact panel content — landscape phone sidebar (180px wide)
+function LandscapePanelContent({ constellationName }: { constellationName: string }) {
+  const { constellation } = useConstellationHighlight()
+  const togglePanel = useUIStore(s => s.togglePanel)
+
+  const isOphiuchus = constellation.name === 'Ophiuchus'
+  const daysColor = isOphiuchus ? '#a78bfa' : '#f59e0b'
+
+  const startFormatted = formatMonthDay(constellation.startDate)
+  const endFormatted = formatMonthDay(constellation.endDate)
+
+  return (
+    <motion.div
+      key={constellationName}
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4 }}
+      transition={{ duration: 0.25 }}
+    >
+      {/* Header: emoji + name + × */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '8px' }}>
+        <div>
+          <div style={{ fontSize: '22px', lineHeight: 1 }}>{constellation.emoji}</div>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', fontFamily: 'Cinzel, serif', lineHeight: 1.2, marginTop: '4px' }}>
+            {constellation.nameEs}
+          </div>
+          <div style={{ fontSize: '9px', color: 'rgba(148,163,184,0.6)', fontFamily: 'monospace', marginTop: '2px' }}>
+            {constellation.name}
+          </div>
+        </div>
+        <button
+          onClick={togglePanel}
+          style={{ fontSize: '14px', color: 'rgba(148,163,184,0.5)', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0, flexShrink: 0 }}
+          className="hover:text-slate-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400/70"
+          aria-label="Cerrar panel de información"
+        >
+          ×
+        </button>
+      </div>
+
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', margin: '8px 0' }} />
+
+      {/* Duration */}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '2px' }}>
+        <span style={{ fontSize: '28px', fontWeight: 700, color: daysColor, fontFamily: 'Cinzel, serif', lineHeight: 1 }}>
+          {constellation.durationDays}
+        </span>
+        <span style={{ fontSize: '11px', color: 'rgba(148,163,184,0.5)' }}>días</span>
+      </div>
+      <div style={{ fontSize: '10px', color: 'rgba(71,85,105,0.9)', fontFamily: 'monospace', marginTop: '2px' }}>
+        {startFormatted} – {endFormatted}
+      </div>
+
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', margin: '8px 0' }} />
+
+      {/* Zodiac sign */}
+      {isOphiuchus ? (
+        <span style={{
+          fontSize: '10px',
+          color: 'rgba(196,181,253,0.8)',
+          border: '1px solid rgba(124,58,237,0.25)',
+          borderRadius: '4px',
+          padding: '2px 6px',
+          display: 'inline-block',
+        }}>
+          Ignorada por la astrología
+        </span>
+      ) : (
+        <>
+          <div style={{ fontSize: '9px', color: 'rgba(71,85,105,0.8)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>
+            Signo astrológico
+          </div>
+          <div style={{ fontSize: '11px', color: 'rgba(148,163,184,0.8)' }}>
+            {constellation.zodiacEquivalent}
+          </div>
+        </>
+      )}
+
+      {/* CTA */}
+      <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+        <Link
+          href="/calculator"
+          style={{ fontSize: '10px', color: 'rgba(71,85,105,0.8)', textDecoration: 'none' }}
+          className="hover:text-slate-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400/70 rounded"
+        >
+          ¿Naciste aquí? →
+        </Link>
+      </div>
+    </motion.div>
+  )
+}
+
 export function SimulationSidePanel() {
   const isPanelOpen = useUIStore(s => s.isPanelOpen)
   const togglePanel = useUIStore(s => s.togglePanel)
   const { constellation } = useConstellationHighlight()
-
-  const [isPhone, setIsPhone] = useState(false)
-  useEffect(() => {
-    setIsPhone(window.matchMedia('(max-width: 479px)').matches)
-  }, [])
-
-  const [isLandscapePhone, setIsLandscapePhone] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia('(orientation: landscape) and (max-height: 500px)')
-    setIsLandscapePhone(mq.matches)
-    const handler = (e: MediaQueryListEvent) => setIsLandscapePhone(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
+  const { isPhone, isLandscapePhone } = useLayoutMode()
 
   const isOphiuchus = constellation.name === 'Ophiuchus'
 
-  const panelBg = isOphiuchus
-    ? 'rgba(4, 0, 18, 0.80)'
-    : 'rgba(0, 0, 8, 0.75)'
-  const panelBorder = isOphiuchus
-    ? 'rgba(124, 58, 237, 0.25)'
-    : 'rgba(255, 255, 255, 0.06)'
+  const panelBg = isOphiuchus ? 'rgba(4, 0, 18, 0.80)' : 'rgba(0, 0, 8, 0.75)'
+  const panelBorder = isOphiuchus ? 'rgba(124, 58, 237, 0.25)' : 'rgba(255, 255, 255, 0.06)'
+
+  const landscapePanelBg = isOphiuchus ? 'rgba(4, 0, 18, 0.82)' : 'rgba(0, 0, 8, 0.82)'
 
   return (
     <>
-      {/* Toggle button when panel is closed */}
+      {/* Toggle button when panel is closed — desktop and landscape */}
       <AnimatePresence>
         {!isPanelOpen && (
           <motion.button
@@ -174,8 +253,11 @@ export function SimulationSidePanel() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={togglePanel}
-            className={`absolute top-[88px] right-5 w-9 h-9 rounded-lg ${isLandscapePhone ? 'flex' : 'hidden md:flex'} items-center justify-center text-white/40 hover:text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70`}
+            className={`absolute w-9 h-9 rounded-lg ${isLandscapePhone ? 'flex' : 'hidden md:flex'} items-center justify-center text-white/40 hover:text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70`}
             style={{
+              // In landscape: below the floating play/pause button (top-8px) to avoid overlap
+              top: isLandscapePhone ? '50px' : '88px',
+              right: isLandscapePhone ? '188px' : '20px',
               background: 'rgba(0, 0, 8, 0.72)',
               backdropFilter: 'blur(12px)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -187,7 +269,7 @@ export function SimulationSidePanel() {
         )}
       </AnimatePresence>
 
-      {/* Desktop panel */}
+      {/* Desktop panel — also shown in landscape with compact style */}
       <AnimatePresence>
         {isPanelOpen && (
           <motion.div
@@ -196,26 +278,40 @@ export function SimulationSidePanel() {
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className={`absolute overflow-y-auto z-10 ${isLandscapePhone ? 'block' : 'hidden md:block'}`}
-            style={{
+            style={isLandscapePhone ? {
+              background: landscapePanelBg,
+              backdropFilter: 'blur(16px) saturate(160%)',
+              borderLeft: `1px solid ${panelBorder}`,
+              borderRadius: 0,
+              padding: '10px 12px',
+              top: 0,
+              right: 0,
+              width: '180px',
+              height: '100%',
+            } : {
               background: panelBg,
               backdropFilter: 'blur(16px) saturate(160%)',
               border: `1px solid ${panelBorder}`,
               borderRadius: '16px',
               padding: '20px',
-              top: isLandscapePhone ? '64px' : '80px',
+              top: '80px',
               right: '20px',
-              width: isLandscapePhone ? '200px' : '280px',
-              maxHeight: isLandscapePhone ? 'calc(100vh - 80px)' : 'calc(100vh - 120px)',
+              width: '280px',
+              maxHeight: 'calc(100vh - 120px)',
             }}
           >
             <AnimatePresence mode="wait">
-              <PanelContent key={constellation.name} constellationName={constellation.name} />
+              {isLandscapePhone ? (
+                <LandscapePanelContent key={constellation.name} constellationName={constellation.name} />
+              ) : (
+                <PanelContent key={constellation.name} constellationName={constellation.name} />
+              )}
             </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Mobile bottom sheet */}
+      {/* Mobile bottom sheet — portrait only, not landscape */}
       <>
         {/*
           Backdrop: always in the DOM on mobile, controls its own opacity and
@@ -246,7 +342,7 @@ export function SimulationSidePanel() {
                 borderRadius: '20px 20px 0 0',
               }}
             >
-              {/* Drag handle — drag is restricted to this element to avoid conflicting with scroll */}
+              {/* Drag handle */}
               <motion.div
                 drag="y"
                 dragConstraints={{ top: 0, bottom: 120 }}
@@ -259,11 +355,7 @@ export function SimulationSidePanel() {
               >
                 <div
                   className="rounded-full"
-                  style={{
-                    width: '36px',
-                    height: '3px',
-                    background: 'rgba(255, 255, 255, 0.15)',
-                  }}
+                  style={{ width: '36px', height: '3px', background: 'rgba(255, 255, 255, 0.15)' }}
                 />
               </motion.div>
               <div className="px-5 pb-8">
@@ -276,9 +368,8 @@ export function SimulationSidePanel() {
         </AnimatePresence>
       </>
 
-      {/* Mobile info button — always in DOM at z-40 to stay above the exiting bottom sheet (z-30).
-          pointerEvents driven by React state (not animation) so it becomes clickable the instant
-          isPanelOpen turns false, with no dependency on animation timing. */}
+      {/* Mobile ℹ button — portrait phone only, always in DOM at z-40 above the exiting bottom sheet.
+          Hidden in landscape (opacity 0, pointer-events none). */}
       <motion.button
         initial={{ opacity: 0 }}
         animate={{ opacity: isPanelOpen || isLandscapePhone ? 0 : 1 }}
