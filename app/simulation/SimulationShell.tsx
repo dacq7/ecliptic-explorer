@@ -11,6 +11,7 @@ import { SimulationFallback2D } from './SimulationFallback2D'
 import { SimulationSidePanel } from './SimulationSidePanel'
 import { DateSlider } from './DateSlider'
 import { ExplorerControls } from './ExplorerControls'
+import { PortraitInvitation } from './PortraitInvitation'
 
 export function SimulationShell() {
   useWebGLDetect()
@@ -23,6 +24,19 @@ export function SimulationShell() {
   const [isPhone, setIsPhone] = useState(false)
   useEffect(() => {
     setIsPhone(window.matchMedia('(max-width: 479px)').matches)
+  }, [])
+
+  const [isPortraitPhone, setIsPortraitPhone] = useState(false)
+  const [isDismissed, setIsDismissed] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(orientation: portrait) and (max-width: 767px)')
+    setIsPortraitPhone(mq.matches)
+    const handler = (e: MediaQueryListEvent) => {
+      setIsPortraitPhone(e.matches)
+      if (!e.matches) setIsDismissed(false)
+    }
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
   }, [])
 
   // Drag hint — shown for 3s on mobile, then fades out
@@ -42,6 +56,11 @@ export function SimulationShell() {
       role="img"
       aria-label="Simulación del plano eclíptico. El Sol se mueve por las 13 constelaciones reales según la fecha seleccionada."
     >
+      {/* Portrait invitation — phone portrait only, dismissible */}
+      {isPortraitPhone && !isDismissed && (
+        <PortraitInvitation onDismiss={() => setIsDismissed(true)} />
+      )}
+
       {/* Layer 0: canvas */}
       {is2DFallback ? <SimulationFallback2D /> : <SolarCanvas />}
 

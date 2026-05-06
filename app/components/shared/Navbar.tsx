@@ -87,7 +87,7 @@ export function Navbar() {
 
       {/* Mobile overlay */}
       <div
-        className={`fixed inset-0 top-16 z-40 bg-[#0a0a1a]/98 backdrop-blur-md flex flex-col items-center justify-center gap-8 md:hidden transition-opacity duration-200 ${
+        className={`fixed inset-0 top-16 z-40 bg-[#07071a] flex flex-col items-center justify-center gap-8 md:hidden transition-opacity duration-200 ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
@@ -99,7 +99,7 @@ export function Navbar() {
             className={`font-display text-2xl font-bold tracking-[0.1em] uppercase transition-colors duration-200 ${
               isActive(href, exact)
                 ? 'text-amber-400'
-                : 'text-slate-300 hover:text-white'
+                : 'text-white/75 hover:text-white'
             }`}
           >
             {label}
