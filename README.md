@@ -29,8 +29,6 @@ An interactive 3D visualization of the Sun's actual path along the ecliptic. Ast
 
 ---
 
-<!-- SCREENSHOTS — uncomment once the PNGs are committed to .github/screenshots/
-
 ## Screenshots
 
 ### The simulation — the Sun on the ecliptic ring
@@ -50,8 +48,6 @@ An interactive 3D visualization of the Sun's actual path along the ecliptic. Ast
 | ![Compare](.github/screenshots/05-compare.png) **Astronomy vs astrology** | ![Learn](.github/screenshots/06-learn.png) **Learn** |
 
 </details>
-
--->
 
 ---
 
