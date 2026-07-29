@@ -42,4 +42,3 @@ next-env.d.ts
 
 # claude agent workspace (estrategia interna — no publicar)
 .claude/
-CLAUDE.md
